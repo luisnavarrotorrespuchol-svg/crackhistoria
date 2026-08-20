@@ -1,0 +1,2518 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Personaje de la Historia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3EDE0;
+    --surface:#FFFFFF;
+    --surface-2:#E8DFC8;
+    --ink:#241C12;
+    --muted:#7C7057;
+    --accent:#6B3FA0;
+    --accent-ink:#FFFFFF;
+    --gold:#B8860B;
+    --line:#DED2B0;
+    --danger:#B33A3A;
+    --good:#1F7A4D;
+    --shadow: 0 1px 2px rgba(36,28,18,.06), 0 8px 24px rgba(36,28,18,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#120E1A;
+      --surface:#1C1626;
+      --surface-2:#241C33;
+      --ink:#F1E9DA;
+      --muted:#A79A8A;
+      --accent:#9B6FD9;
+      --accent-ink:#120E1A;
+      --gold:#E0B84A;
+      --line:#332A44;
+      --danger:#E0645F;
+      --good:#35A76B;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#120E1A;
+    --surface:#1C1626;
+    --surface-2:#241C33;
+    --ink:#F1E9DA;
+    --muted:#A79A8A;
+    --accent:#9B6FD9;
+    --accent-ink:#120E1A;
+    --gold:#E0B84A;
+    --line:#332A44;
+    --danger:#E0645F;
+    --good:#35A76B;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans', system-ui, sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .wrap{
+    max-width:600px;
+    margin:0 auto;
+    padding:28px 18px 64px;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    margin-bottom:22px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .eyebrow b{ color:var(--gold); font-weight:700; }
+  h1{
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:clamp(34px,9vw,46px);
+    letter-spacing:.01em;
+    text-transform:uppercase;
+    margin:2px 0 0;
+    text-wrap:balance;
+  }
+  h1 .accent{ color:var(--accent); }
+  .subtitle{
+    color:var(--muted);
+    font-size:14.5px;
+    max-width:44ch;
+    line-height:1.5;
+  }
+  .rules-btn{
+    background:none;border:1px solid var(--line);color:var(--muted);
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;
+    padding:5px 10px;border-radius:20px;cursor:pointer;margin-top:6px;
+    text-transform:uppercase;
+  }
+  .rules-btn:hover{ border-color:var(--accent); color:var(--accent); }
+
+  /* ---------- attempt dots ---------- */
+  .dots{
+    display:flex;
+    gap:9px;
+    justify-content:center;
+    margin:18px 0 20px;
+  }
+  .dot{
+    width:15px;height:15px;border-radius:50%;
+    border:2px solid var(--line);
+    background:transparent;
+    position:relative;
+    transition:transform .2s ease;
+  }
+  .dot.used{ border-color:var(--muted); background:var(--surface-2); }
+  .dot.current{ border-color:var(--gold); box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 20%, transparent); }
+  .dot.correct{ border-color:var(--good); background:var(--good); }
+  .dot.wrong{ border-color:var(--danger); background:var(--danger); }
+
+  /* ---------- clue card ---------- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+  .clue-list{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border-radius:16px 16px 0 0;
+  }
+  .clue{
+    display:grid;
+    grid-template-columns:40px 1fr;
+    gap:12px;
+    padding:14px 18px;
+    border-bottom:1px solid var(--line);
+    animation:reveal .35s ease both;
+  }
+  .clue:last-child{ border-bottom:none; }
+  @keyframes reveal{
+    from{ opacity:0; transform:translateY(-4px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .clue-num{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:13px;
+    color:var(--gold);
+    display:flex;
+    align-items:flex-start;
+    padding-top:1px;
+  }
+  .clue-text{
+    font-size:15.5px;
+    line-height:1.5;
+  }
+
+  /* ---------- guess form ---------- */
+  .guess-zone{ padding:16px 18px 18px; position:relative; }
+  .guess-row{ display:flex; gap:8px; position:relative; }
+  input.guess-input{
+    flex:1;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    font-size:15px;
+    padding:11px 14px;
+    border-radius:10px;
+    outline:none;
+  }
+  input.guess-input:focus{ border-color:var(--accent); }
+  button.submit-btn{
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-weight:600;
+    font-size:14px;
+    background:var(--accent);
+    color:var(--accent-ink);
+    border:none;
+    border-radius:10px;
+    padding:0 20px;
+    cursor:pointer;
+  }
+  button.submit-btn:disabled{ opacity:.4; cursor:not-allowed; }
+  button.submit-btn:not(:disabled):hover{ filter:brightness(1.08); }
+
+  .suggestions{
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0; right:78px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow:var(--shadow);
+    max-height:220px;
+    overflow-y:auto;
+    z-index:5;
+    display:none;
+  }
+  .suggestions.open{ display:block; }
+  .suggestion{
+    padding:9px 14px;
+    font-size:14.5px;
+    cursor:pointer;
+  }
+  .suggestion:hover, .suggestion.active{ background:var(--surface-2); }
+
+  /* ---------- history ---------- */
+  .history{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-top:12px;
+  }
+  .history-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:14px;
+    padding:8px 12px;
+    border-radius:8px;
+    background:var(--surface-2);
+  }
+  .history-item .mark{
+    width:18px;height:18px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;flex:none;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .history-item.wrong .mark{ background:var(--danger); color:#fff; }
+  .history-item .name{ color:var(--muted); text-decoration:line-through; }
+
+  /* ---------- result ---------- */
+  .result{
+    margin-top:16px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:22px 20px;
+    text-align:center;
+    display:none;
+  }
+  .result.show{ display:block; animation:reveal .4s ease both; }
+  .result-flag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .result-flag.win{ color:var(--good); }
+  .result-flag.lose{ color:var(--danger); }
+  .avatar{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--surface-2);
+    border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;
+    margin:0 auto 12px;
+  }
+  .result-name{
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:26px;
+    text-transform:uppercase;
+    margin-bottom:4px;
+    text-wrap:balance;
+  }
+  .result-sub{ color:var(--muted); font-size:13.5px; margin-bottom:16px; }
+  .result-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .action-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:9px 16px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:var(--surface-2);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .action-btn.primary{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  .action-btn:hover{ filter:brightness(1.05); }
+  .countdown{
+    margin-top:14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .countdown b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+
+  /* ---------- rules overlay ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(18,14,26,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:20;
+  }
+  .overlay.open{ display:flex; }
+  .overlay-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    max-width:420px;
+    width:100%;
+    padding:22px 22px 20px;
+    box-shadow:var(--shadow);
+  }
+  .overlay-card h2{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    font-size:20px;
+    margin:0 0 10px;
+  }
+  .overlay-card p, .overlay-card li{ font-size:14.5px; line-height:1.6; color:var(--ink); }
+  .overlay-card ol{ padding-left:20px; margin:0 0 14px; }
+  .overlay-close{
+    width:100%;
+    margin-top:6px;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    margin-top:26px;
+    letter-spacing:.04em;
+  }
+
+  /* ---------- points ---------- */
+  .points-line{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--gold);
+    margin-bottom:14px;
+  }
+  .points-line b{ font-size:17px; }
+  .action-btn.whatsapp{
+    background:#25D366;
+    border-color:#25D366;
+    color:#08150E;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+  }
+
+  /* ---------- leaderboard ---------- */
+  .lb-card{
+    margin-top:16px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:18px 18px 20px;
+  }
+  .lb-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .lb-title{
+    font-family:'Oswald', sans-serif;
+    text-transform:uppercase;
+    font-weight:600;
+    font-size:16px;
+    letter-spacing:.02em;
+  }
+  .lb-tabs{ display:flex; gap:6px; }
+  .lb-tab{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .lb-tab.active{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .lb-rows{ display:flex; flex-direction:column; gap:5px; }
+  .lb-row{
+    display:grid;
+    grid-template-columns:24px 1fr auto auto;
+    gap:10px;
+    align-items:center;
+    padding:8px 10px;
+    border-radius:8px;
+    background:var(--surface-2);
+    font-size:14px;
+  }
+  .lb-row.me{ outline:1.5px solid var(--gold); }
+  .lb-rank{ font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:12px; }
+  .lb-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lb-clues{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); }
+  .lb-pts{ font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; }
+  .lb-empty{ color:var(--muted); font-size:13.5px; text-align:center; padding:14px 0; }
+  .lb-note{ margin-top:10px; font-size:12px; color:var(--muted); line-height:1.5; }
+
+  /* ---------- nickname modal ---------- */
+  .nick-row{ display:flex; gap:8px; margin-top:4px; }
+  .nick-row input{
+    flex:1;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    font-size:15px;
+    padding:10px 12px;
+    border-radius:10px;
+    outline:none;
+  }
+  .nick-row input:focus{ border-color:var(--accent); }
+
+  @media (prefers-reduced-motion: reduce){
+    .clue, .result{ animation:none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">CAPÍTULO <b id="matchday">#0</b> · <span id="datestr"></span></div>
+    <h1>PERSONAJE <span class="accent">DE LA HISTORIA</span></h1>
+    <p class="subtitle">Adivina al personaje histórico con un máximo de 5 pistas. Cuantas menos necesites, mejor tu resultado.</p>
+    <button class="rules-btn" id="rulesBtn">Cómo se juega</button>
+  </header>
+
+  <div class="dots" id="dots"></div>
+
+  <div class="card">
+    <div class="clue-list" id="clueList"></div>
+    <div class="guess-zone" id="guessZone">
+      <div class="guess-row">
+        <input type="text" class="guess-input" id="guessInput" placeholder="Escribe el nombre del personaje…" autocomplete="off">
+        <button class="submit-btn" id="submitBtn">Adivinar</button>
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+      <div class="history" id="history"></div>
+    </div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="result-flag" id="resultFlag"></div>
+    <div class="avatar" id="avatar"></div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-sub" id="resultSub"></div>
+    <div class="points-line" id="pointsLine"></div>
+    <div class="result-actions">
+      <button class="action-btn primary" id="shareBtn">Copiar resultado</button>
+      <a class="action-btn whatsapp" id="whatsappBtn" href="#" target="_blank" rel="noopener">Compartir en WhatsApp</a>
+    </div>
+    <div class="countdown">Próximo personaje a las 9:00 (hora de España), en <b id="countdown">--:--:--</b></div>
+  </div>
+
+  <div class="lb-card" id="groupCard">
+    <div class="lb-head">
+      <div class="lb-title">👥 Grupo</div>
+    </div>
+    <div id="groupNone">
+      <p class="lb-note" style="margin-top:0;">Juega con tus amigos: crea un grupo y comparte el enlace para sumar puntos juntos.</p>
+      <button class="action-btn primary" id="groupCreateBtn">Crear grupo</button>
+    </div>
+    <div id="groupActive" style="display:none;">
+      <p class="lb-note" style="margin-top:0;">Estás en el grupo <b id="groupNameLabel"></b>.</p>
+      <div class="result-actions" style="justify-content:flex-start;">
+        <button class="action-btn primary" id="groupCopyBtn">Copiar enlace</button>
+        <a class="action-btn whatsapp" id="groupWhatsappBtn" href="#" target="_blank" rel="noopener">Invitar por WhatsApp</a>
+        <button class="action-btn" id="groupLeaveBtn">Salir del grupo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="lb-card">
+    <div class="lb-head">
+      <div class="lb-title">🏆 Clasificación</div>
+      <div class="lb-tabs">
+        <button class="lb-tab active" data-mode="today" id="tabToday">Hoy</button>
+        <button class="lb-tab" data-mode="total" id="tabTotal">General</button>
+        <button class="lb-tab" data-mode="group" id="tabGroup" style="display:none;">Mi grupo</button>
+      </div>
+    </div>
+    <div class="lb-rows" id="lbRows"></div>
+    <div class="lb-note" id="lbNote"></div>
+  </div>
+
+  <table style="display:none"><tbody id="lbBody" artifact-sync></tbody></table>
+
+  <footer>📜 UN PERSONAJE NUEVO CADA DÍA · TODA LA HISTORIA DEL MUNDO · <span id="changeNick" style="cursor:pointer;text-decoration:underline;">cambiar nombre</span></footer>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-card">
+    <h2>Cómo se juega</h2>
+    <ol>
+      <li>Cada día hay un personaje histórico misterioso de cualquier época y lugar del mundo.</li>
+      <li>Se revela una pista para empezar. Es la más difícil.</li>
+      <li>Cada vez que falles, se revela una nueva pista, algo más fácil.</li>
+      <li>Tienes un máximo de 5 pistas y 5 intentos para acertar.</li>
+    </ol>
+    <p>Cuantas menos pistas necesites, más puntos consigues: 100, 80, 60, 40 o 20. El personaje es el mismo para todo el mundo cada día.</p>
+    <button class="action-btn primary overlay-close" id="overlayClose">Entendido</button>
+  </div>
+</div>
+
+<div class="overlay" id="nickOverlay">
+  <div class="overlay-card">
+    <h2>¿Cómo te llamas?</h2>
+    <p>Elige un nombre para aparecer en la clasificación cuando aciertes o falles.</p>
+    <div class="nick-row">
+      <input type="text" id="nickInput" maxlength="18" placeholder="Tu nombre o apodo">
+      <button class="action-btn primary" id="nickSave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="groupOverlay">
+  <div class="overlay-card">
+    <h2>Crear grupo</h2>
+    <p>Ponle un nombre a tu grupo. Después consigue el enlace para invitar a quien quieras — todos los que entren por ese enlace sumarán puntos juntos.</p>
+    <div class="nick-row">
+      <input type="text" id="groupNameInput" maxlength="24" placeholder="Nombre del grupo">
+      <button class="action-btn primary" id="groupCreateSave">Crear</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  var PLAYERS = [
+    {name:"Cleopatra VII", aliases:["cleopatra"], clues:[
+      "Última gobernante de la dinastía ptolemaica, nacida en el norte de África en el año 69 a.C., descendiente de un general de Alejandro Magno.",
+      "Se dice que se hizo introducir enrollada en una alfombra en el palacio de un general romano para reunirse con él a solas.",
+      "Tuvo hijos con dos de los hombres más poderosos de Roma, primero con un dictador y luego con uno de sus lugartenientes.",
+      "Su alianza con Marco Antonio terminó en derrota militar frente a Octavio en la batalla de Actium, en el año 31 a.C.",
+      "Según la leyenda, se quitó la vida dejándose morder por una serpiente venenosa; fue la última faraona de Egipto."
+    ]},
+    {name:"Julio César", aliases:["julio cesar","cayo julio cesar","cesar"], clues:[
+      "Militar y político romano nacido en el 100 a.C. en el seno de una familia patricia que decía descender de la diosa Venus.",
+      "Conquistó una amplia región al norte de Italia tras varios años de campañas, narradas por él mismo en sus comentarios de guerra.",
+      "Cruzó un pequeño río con su ejército desafiando al Senado, pronunciando una frase sobre una decisión sin marcha atrás.",
+      "Se proclamó dictador vitalicio de Roma, acumulando un poder que muchos senadores consideraron una amenaza para la República.",
+      "Fue asesinado a puñaladas por un grupo de senadores, entre ellos Bruto, en los idus de marzo del año 44 a.C."
+    ]},
+    {name:"Alejandro Magno", aliases:["alejandro iii de macedonia","alejandro magno","alejandro el grande"], clues:[
+      "Rey nacido en Macedonia en el 356 a.C., educado de niño por un célebre filósofo griego discípulo de Platón.",
+      "Heredó el trono de su padre siendo apenas un adolescente y unificó las ciudades-estado griegas bajo su mando.",
+      "Derrotó al Imperio persa en varias batallas decisivas, conquistando territorios desde Egipto hasta la actual Pakistán.",
+      "Fundó decenas de ciudades que llevaban su propio nombre, entre ellas una gran urbe egipcia junto al Mediterráneo.",
+      "Murió en Babilonia a los 32 años sin haber sido derrotado en el campo de batalla, creando el imperio más extenso de su tiempo."
+    ]},
+    {name:"Aristóteles", aliases:["aristoteles"], clues:[
+      "Filósofo nacido en Estagira, en el norte de Grecia, en el 384 a.C., hijo del médico personal de un rey macedonio.",
+      "Estudió durante veinte años en la academia de otro gran pensador griego antes de fundar su propia escuela en Atenas.",
+      "Fue tutor de un joven príncipe que más tarde conquistaría un imperio que se extendería hasta la India.",
+      "Escribió tratados fundamentales sobre lógica, física, ética y política que dominaron el pensamiento occidental durante siglos.",
+      "Fundó el Liceo de Atenas y es considerado, junto a su maestro Platón, uno de los padres de la filosofía occidental."
+    ]},
+    {name:"Platón", aliases:["platon"], clues:[
+      "Filósofo ateniense nacido hacia el 428 a.C. en una familia aristocrática, discípulo del pensador más célebre de su ciudad.",
+      "Su maestro fue condenado a muerte por la ciudad de Atenas, un hecho que marcó profundamente toda su obra posterior.",
+      "Escribió sus ideas en forma de diálogos, muchos de ellos protagonizados por su propio maestro como personaje principal.",
+      "Propuso la teoría de las ideas y describió una alegoría sobre unos prisioneros encadenados que solo ven sombras en una cueva.",
+      "Fundó la Academia de Atenas, una de las primeras instituciones de enseñanza superior de Occidente."
+    ]},
+    {name:"Sócrates", aliases:["socrates"], clues:[
+      "Filósofo ateniense nacido hacia el 470 a.C., hijo de un escultor, que nunca dejó nada escrito de su propio puño.",
+      "Desarrolló un método de enseñanza basado en preguntas sucesivas para hacer que sus interlocutores cuestionaran sus certezas.",
+      "Afirmaba no saber nada con certeza, resumiendo su sabiduría en una célebre frase sobre reconocer la propia ignorancia.",
+      "Fue acusado de corromper a la juventud ateniense y de no honrar a los dioses de la ciudad.",
+      "Fue condenado a muerte y bebió una copa de cicuta rodeado de sus discípulos, entre ellos Platón."
+    ]},
+    {name:"Confucio", aliases:["confucio","kongzi","kong qiu"], clues:[
+      "Pensador chino nacido en el estado de Lu hacia el 551 a.C., en una época de guerras entre reinos rivales.",
+      "Trabajó como funcionario y maestro itinerante, ofreciendo consejo a gobernantes que rara vez seguían sus recomendaciones.",
+      "Sus enseñanzas sobre la moral, la familia y el buen gobierno fueron recopiladas por sus discípulos tras su muerte.",
+      "Su pensamiento se convirtió en la base filosófica y ética del Estado chino durante más de dos mil años.",
+      "Sus máximas se recogen en un libro llamado Analectas, y su filosofía lleva su nombre latinizado."
+    ]},
+    {name:"Buda", aliases:["buda","siddharta gautama","siddhartha gautama"], clues:[
+      "Príncipe nacido en torno al siglo VI a.C. en la región del actual Nepal, criado alejado del sufrimiento del mundo exterior.",
+      "Abandonó su palacio, a su esposa y a su hijo tras presenciar por primera vez la vejez, la enfermedad y la muerte.",
+      "Pasó años practicando el ascetismo extremo antes de alcanzar la iluminación meditando bajo un árbol.",
+      "Enseñó un camino medio entre el lujo y la privación absoluta, resumido en las llamadas cuatro nobles verdades.",
+      "Sus enseñanzas dieron origen a una de las grandes religiones del mundo, que lleva su título honorífico, que significa 'el iluminado'."
+    ]},
+    {name:"Ramsés II", aliases:["ramses ii","ramses el grande","ramses"], clues:[
+      "Faraón egipcio que reinó a partir de 1279 a.C., durante una de las dinastías más poderosas del Antiguo Egipto.",
+      "Libró una gran batalla contra el Imperio hitita que terminó en uno de los primeros tratados de paz de la historia.",
+      "Ordenó construir numerosos templos monumentales, entre ellos uno excavado en la roca con cuatro estatuas colosales de sí mismo.",
+      "Tuvo un reinado excepcionalmente largo, de casi setenta años, y decenas de hijos con varias esposas.",
+      "Su momia se conserva hasta hoy y fue trasladada en avión con pasaporte propio para su restauración en el siglo XX."
+    ]},
+    {name:"Nefertiti", aliases:["nefertiti"], clues:[
+      "Reina egipcia que vivió en el siglo XIV a.C., esposa principal de un faraón que impulsó una profunda reforma religiosa.",
+      "Su marido intentó imponer el culto exclusivo a un único dios solar, apartándose de la tradición politeísta egipcia.",
+      "Aparece representada junto a su esposo con un poder e influencia inusuales para una reina de su época.",
+      "Su nombre significa 'la bella ha llegado', y un famoso busto suyo se conserva hoy en un museo de Berlín.",
+      "Fue madre de varias hijas y, probablemente, suegra o madre del joven faraón Tutankamón."
+    ]},
+    {name:"Tutankamón", aliases:["tutankamon","tutankhamon"], clues:[
+      "Faraón egipcio que subió al trono siendo apenas un niño, hacia el año 1332 a.C., durante la dinastía XVIII.",
+      "Restauró el culto a los dioses tradicionales tras la reforma religiosa impulsada por su predecesor.",
+      "Murió joven, en torno a los diecinueve años, por causas que los historiadores todavía debaten.",
+      "Su tumba, casi intacta, fue descubierta en el Valle de los Reyes en 1922 por un arqueólogo británico.",
+      "Su máscara funeraria de oro macizo es una de las imágenes más reconocibles del Antiguo Egipto."
+    ]},
+    {name:"Ciro el Grande", aliases:["ciro el grande","ciro ii","ciro de persia"], clues:[
+      "Fundador de un vasto imperio persa en el siglo VI a.C., que llegó a extenderse desde Asia Menor hasta la India.",
+      "Conquistó Babilonia sin apenas resistencia y liberó a los pueblos que habían sido deportados por reyes anteriores.",
+      "Permitió a los judíos exiliados en Babilonia regresar a Jerusalén y reconstruir su templo.",
+      "Se le atribuye un cilindro de arcilla considerado por algunos como una de las primeras declaraciones de derechos humanos.",
+      "Fundó el Imperio aqueménida, el mayor imperio conocido hasta entonces, con capital en Persépolis."
+    ]},
+    {name:"Pericles", aliases:["pericles"], clues:[
+      "Político y militar ateniense nacido hacia el 495 a.C., miembro de una influyente familia aristocrática.",
+      "Impulsó reformas democráticas que ampliaron la participación política de los ciudadanos atenienses.",
+      "Ordenó la reconstrucción de los templos de la Acrópolis, destruidos años antes durante las guerras contra Persia.",
+      "Dirigió la política de Atenas durante casi tres décadas, en lo que se conoce como el siglo de oro de la ciudad.",
+      "Murió durante una epidemia de peste en plena guerra contra Esparta, la conocida como guerra del Peloponeso."
+    ]},
+    {name:"Augusto", aliases:["augusto","octavio","octavio augusto","cayo octavio"], clues:[
+      "Nacido en Roma en el 63 a.C. como sobrino nieto de un célebre dictador, fue adoptado como su heredero tras su asesinato.",
+      "Se alió inicialmente con Marco Antonio y otro general para vengar la muerte de su tío adoptivo.",
+      "Derrotó a Marco Antonio y Cleopatra en la batalla naval de Actium, convirtiéndose en el hombre más poderoso de Roma.",
+      "Puso fin a un siglo de guerras civiles e instauró un largo periodo de paz conocido con un nombre latino.",
+      "Se convirtió en el primer emperador romano, dando origen a la dinastía julio-claudia y a un mes del calendario con su nombre."
+    ]},
+    {name:"Nerón", aliases:["neron"], clues:[
+      "Emperador romano que subió al trono a los diecisiete años, en el 54 d.C., tras la muerte de su padrastro.",
+      "Se le acusó de haber mandado asesinar a su propia madre para consolidar su poder.",
+      "Durante su reinado se produjo un gran incendio que destruyó gran parte de Roma, y muchos le culparon a él.",
+      "Persiguió duramente a los primeros cristianos, a quienes responsabilizó públicamente de aquel incendio.",
+      "Se suicidó en el año 68 d.C. cuando el Senado lo declaró enemigo público, poniendo fin a la dinastía julio-claudia."
+    ]},
+    {name:"Espartaco", aliases:["espartaco"], clues:[
+      "Esclavo de origen tracio que en el año 73 a.C. entrenaba como gladiador en una escuela cerca de Capua, en Italia.",
+      "Lideró una fuga junto a un pequeño grupo de compañeros esclavos armados con utensilios de cocina.",
+      "Su ejército, formado por decenas de miles de esclavos fugados, derrotó a varias legiones romanas enviadas contra él.",
+      "Intentó cruzar los Alpes para dispersar a sus seguidores fuera de Italia, pero finalmente decidió enfrentarse a Roma.",
+      "Murió en batalla contra las tropas del general Craso, y miles de sus seguidores fueron crucificados a lo largo de la Vía Apia."
+    ]},
+    {name:"Aníbal Barca", aliases:["anibal barca","anibal"], clues:[
+      "General cartaginés nacido hacia el 247 a.C., hijo de otro célebre militar que luchó contra Roma antes que él.",
+      "Juró de niño odio eterno a Roma ante un altar, según cuenta la tradición histórica.",
+      "Cruzó los Alpes con un ejército que incluía varios elefantes de guerra para invadir Italia por sorpresa.",
+      "Infligió a Roma una de sus mayores derrotas militares en la batalla de Cannas, rodeando y aniquilando a un ejército mucho mayor.",
+      "Fue finalmente derrotado por el general romano Escipión en la batalla de Zama, en el norte de África."
+    ]},
+    {name:"Arquímedes", aliases:["arquimedes"], clues:[
+      "Científico e inventor griego nacido en Siracusa, en Sicilia, hacia el 287 a.C.",
+      "Descubrió un principio fundamental de la física al observar cómo subía el nivel del agua de una bañera.",
+      "Se dice que salió corriendo desnudo por la calle gritando una palabra griega que significa 'lo encontré'.",
+      "Diseñó máquinas de guerra e ingenios para defender su ciudad natal del asedio de las legiones romanas.",
+      "Murió a manos de un soldado romano mientras estudiaba unas figuras geométricas dibujadas en la arena."
+    ]},
+    {name:"Marco Aurelio", aliases:["marco aurelio"], clues:[
+      "Emperador romano nacido en el año 121 d.C., adoptado como heredero por el emperador Antonino Pío.",
+      "Gobernó Roma en una época marcada por guerras en las fronteras del Danubio y una devastadora epidemia de peste.",
+      "Es considerado uno de los llamados 'cinco buenos emperadores' de Roma por su gobierno prudente y justo.",
+      "Escribió durante sus campañas militares un conjunto de reflexiones filosóficas de inspiración estoica destinadas solo a sí mismo.",
+      "Su obra, conocida como 'Meditaciones', sigue leyéndose hoy como una de las grandes obras de la filosofía práctica."
+    ]},
+    {name:"Genghis Khan", aliases:["genghis khan","gengis kan","temujin"], clues:[
+      "Nacido con el nombre de Temuchin hacia 1162 en las estepas de Mongolia, hijo de un jefe tribal asesinado por rivales.",
+      "Unificó a las tribus mongolas nómadas, tradicionalmente enfrentadas entre sí, bajo un único mando militar.",
+      "Fundó el mayor imperio contiguo de la historia, que se extendió desde China hasta Europa del Este.",
+      "Sus ejércitos eran temidos por su velocidad a caballo, su disciplina y su uso del arco compuesto.",
+      "Adoptó el título de 'Gran Kan', que significa 'gobernante universal', y su imperio fue continuado por sus descendientes."
+    ]},
+    {name:"Kublai Khan", aliases:["kublai khan","kubilai kan"], clues:[
+      "Nieto de un gran conquistador mongol, nació en 1215 y heredó parte del inmenso imperio construido por su abuelo.",
+      "Completó la conquista de China, poniendo fin a una dinastía imperial que había gobernado el país durante siglos.",
+      "Fundó una nueva dinastía imperial china de origen extranjero y trasladó su capital a la actual Pekín.",
+      "Recibió en su corte a un famoso viajero veneciano que más tarde relataría sus experiencias en Asia en un célebre libro.",
+      "Fundó la dinastía Yuan, la primera dinastía china gobernada íntegramente por un pueblo extranjero, los mongoles."
+    ]},
+    {name:"Marco Polo", aliases:["marco polo"], clues:[
+      "Mercader nacido en Venecia en 1254, en el seno de una familia dedicada al comercio con Oriente.",
+      "Viajó junto a su padre y su tío a través de Asia Central siguiendo antiguas rutas comerciales hacia el Extremo Oriente.",
+      "Sirvió durante años en la corte de un poderoso emperador mongol que gobernaba China.",
+      "Tras regresar a Venecia, fue capturado en una guerra contra Génova y dictó el relato de sus viajes desde la prisión.",
+      "Su libro, 'Il Milione', despertó en Europa la fascinación por Asia y sus riquezas durante siglos."
+    ]},
+    {name:"Juana de Arco", aliases:["juana de arco","jeanne d'arc"], clues:[
+      "Campesina francesa nacida en 1412 en un pueblo de Lorena, que aseguraba escuchar voces de santos desde niña.",
+      "Se presentó ante el heredero de la corona francesa asegurando tener una misión divina para liberar a su país.",
+      "Vestida con armadura, lideró al ejército francés que logró romper el asedio inglés de la ciudad de Orleans.",
+      "Fue capturada por tropas borgoñonas aliadas de Inglaterra y entregada a un tribunal eclesiástico.",
+      "Fue quemada en la hoguera acusada de herejía en 1431, y siglos después fue canonizada como santa."
+    ]},
+    {name:"El Cid Campeador", aliases:["el cid","el cid campeador","rodrigo diaz de vivar"], clues:[
+      "Noble castellano nacido hacia 1043 cerca de Burgos, que sirvió como militar al servicio del rey de Castilla.",
+      "Fue desterrado de su reino por el rey Alfonso VI tras ser acusado de apropiarse de tributos ajenos.",
+      "Combatió tanto para reyes cristianos como para gobernantes musulmanes de taifas durante su exilio.",
+      "Conquistó la ciudad de Valencia por su propia cuenta, gobernándola de forma prácticamente independiente hasta su muerte.",
+      "Su vida inspiró un célebre poema épico medieval y es un símbolo de la Reconquista española."
+    ]},
+    {name:"Averroes", aliases:["averroes","ibn rushd"], clues:[
+      "Filósofo y médico nacido en Córdoba en 1126, en la época de esplendor del Al-Ándalus musulmán.",
+      "Trabajó como juez y médico en las cortes de los gobernantes almohades del norte de África y la península ibérica.",
+      "Escribió extensos comentarios sobre la obra de Aristóteles que serían fundamentales para la filosofía medieval europea.",
+      "Sus ideas influyeron notablemente en pensadores cristianos y judíos, generando tanto admiración como controversia religiosa.",
+      "Fue conocido en la Europa medieval por el título de 'el Comentarista' por sus glosas a la obra aristotélica."
+    ]},
+    {name:"Maimónides", aliases:["maimonides","moises ben maimon"], clues:[
+      "Filósofo y médico judío nacido en Córdoba en 1138, que tuvo que huir de la ciudad por la persecución religiosa almohade.",
+      "Se estableció finalmente en Egipto, donde ejerció como médico personal de la corte del sultán.",
+      "Escribió una monumental codificación de la ley judía que sigue siendo consultada por comunidades religiosas.",
+      "Su obra filosófica más célebre intentó conciliar la razón aristotélica con la fe religiosa tradicional.",
+      "Es considerado uno de los mayores sabios de la historia judía, autor de la 'Guía de perplejos'."
+    ]},
+    {name:"Mansa Musa", aliases:["mansa musa"], clues:[
+      "Gobernante del Imperio de Malí, en África occidental, que llegó al trono en torno a 1312.",
+      "Su reino controlaba importantes rutas comerciales de oro y sal a través del desierto del Sahara.",
+      "Realizó una famosa peregrinación a La Meca acompañado de miles de personas y una enorme cantidad de oro.",
+      "Repartió tanto oro durante su viaje por Egipto que provocó una devaluación de esa moneda durante años.",
+      "Es considerado por muchos historiadores como una de las personas más ricas de toda la historia."
+    ]},
+    {name:"Federico Barbarroja", aliases:["federico barbarroja","federico i del sacro imperio"], clues:[
+      "Emperador del Sacro Imperio Romano Germánico coronado en 1155, apodado así por el color de su barba.",
+      "Intentó imponer su autoridad sobre las ricas ciudades del norte de Italia, que se resistieron formando una liga.",
+      "Encabezó una de las grandes cruzadas medievales hacia Tierra Santa junto a otros monarcas europeos.",
+      "Murió ahogado al cruzar un río de Asia Menor durante esa cruzada, sin llegar nunca a Jerusalén.",
+      "Una leyenda alemana asegura que duerme bajo una montaña y despertará para restaurar la grandeza de su imperio."
+    ]},
+    {name:"Isabel la Católica", aliases:["isabel la catolica","isabel i de castilla"], clues:[
+      "Reina castellana nacida en 1451, que accedió al trono tras una guerra civil contra su sobrina por la sucesión.",
+      "Se casó con el heredero de la corona de Aragón, uniendo dos de los principales reinos de la península ibérica.",
+      "Financió el viaje de un navegante genovés que buscaba una nueva ruta hacia Asia navegando hacia el oeste.",
+      "Completó la conquista del último reino musulmán de la península ibérica en 1492, el mismo año de aquel viaje.",
+      "Reinó junto a su esposo Fernando como los Reyes Católicos, sentando las bases del futuro imperio español."
+    ]},
+    {name:"Vlad Tepes", aliases:["vlad tepes","vlad el empalador","vlad iii"], clues:[
+      "Príncipe de Valaquia, en la actual Rumanía, nacido hacia 1431, hijo de un caballero de la Orden del Dragón.",
+      "Defendió sus territorios de las invasiones del Imperio otomano con métodos de una crueldad extrema.",
+      "Era conocido por empalar en largas estacas a sus enemigos y a quienes desobedecían sus órdenes.",
+      "Su patronímico deriva del título de su padre, y con el tiempo pasó a significar 'hijo del dragón' o 'del diablo'.",
+      "Su figura inspiró siglos después al escritor irlandés Bram Stoker para crear al conde Drácula."
+    ]},
+    {name:"Moctezuma II", aliases:["moctezuma ii","moctezuma","montezuma"], clues:[
+      "Noveno gobernante del Imperio azteca, que ascendió al trono de Tenochtitlan en 1502.",
+      "Gobernó un vasto imperio mesoamericano que cobraba tributo a numerosos pueblos sometidos.",
+      "Recibió con regalos a un grupo de extranjeros llegados por mar, a los que en un principio confundió con enviados divinos.",
+      "Fue tomado como rehén por aquellos conquistadores españoles, liderados por Hernán Cortés, dentro de su propio palacio.",
+      "Murió en circunstancias confusas durante un levantamiento de su pueblo contra los invasores españoles en 1520."
+    ]},
+    {name:"Atahualpa", aliases:["atahualpa"], clues:[
+      "Último gobernante soberano del Imperio inca, que había ganado poco antes una guerra civil contra su propio hermano.",
+      "Gobernaba un vasto imperio andino que se extendía a lo largo de la cordillera sudamericana.",
+      "Se reunió en 1532 con un pequeño grupo de conquistadores españoles liderados por Francisco Pizarro en la ciudad de Cajamarca.",
+      "Fue capturado por sorpresa y ofreció llenar una habitación de oro y plata a cambio de su libertad.",
+      "Pese a pagar el rescate, fue ejecutado por los españoles, marcando el fin del Imperio inca independiente."
+    ]},
+    {name:"Cristóbal Colón", aliases:["cristobal colon"], clues:[
+      "Navegante nacido en Génova hacia 1451, que dedicó años a buscar financiación para un ambicioso proyecto marítimo.",
+      "Propuso llegar a Asia navegando hacia el oeste, convencido de que la Tierra era más pequeña de lo que en realidad es.",
+      "Obtuvo el respaldo de los Reyes Católicos de España tras años de rechazos en otras cortes europeas.",
+      "Partió del puerto de Palos en 1492 al mando de tres carabelas, llegando a tierra en el Caribe.",
+      "Realizó cuatro viajes a través del Atlántico sin saber que había llegado a un continente desconocido para los europeos."
+    ]},
+    {name:"Fernando de Magallanes", aliases:["fernando de magallanes","fernao de magalhaes"], clues:[
+      "Navegante portugués nacido hacia 1480, que ofreció sus servicios a la corona española tras un desencuentro con la portuguesa.",
+      "Partió en 1519 al mando de una expedición que buscaba llegar a las islas de las especias navegando hacia el oeste.",
+      "Descubrió un estrecho en el extremo sur de América que hoy lleva su nombre.",
+      "Murió en Filipinas durante un enfrentamiento con habitantes locales, sin completar él mismo el viaje.",
+      "Su expedición, terminada por Juan Sebastián Elcano, logró la primera vuelta al mundo de la historia."
+    ]},
+    {name:"Vasco da Gama", aliases:["vasco da gama"], clues:[
+      "Navegante portugués nacido hacia 1460, encargado por su rey de encontrar una ruta marítima directa hacia la India.",
+      "Zarpó de Lisboa en 1497 al mando de una pequeña flota que bordearía todo el continente africano.",
+      "Rodeó el cabo de Buena Esperanza, en el extremo sur de África, siguiendo la ruta abierta años antes por otro navegante.",
+      "Llegó finalmente a Calicut, en la costa de la India, abriendo una ruta comercial directa por mar hasta Asia.",
+      "Su viaje puso fin al monopolio del comercio de especias que ejercían los mercaderes árabes e italianos."
+    ]},
+    {name:"Hernán Cortés", aliases:["hernan cortes"], clues:[
+      "Conquistador español nacido en Extremadura en 1485, que llegó joven a las islas del Caribe en busca de fortuna.",
+      "Organizó una expedición hacia el interior de México desobedeciendo las órdenes del gobernador de Cuba.",
+      "Se alió con pueblos indígenas enemigos del Imperio azteca para reforzar su pequeño contingente de soldados.",
+      "Tomó como rehén al emperador Moctezuma II antes de que estallara una rebelión que le obligó a huir de la capital.",
+      "Conquistó finalmente Tenochtitlan en 1521, dando origen al virreinato de Nueva España."
+    ]},
+    {name:"Francisco Pizarro", aliases:["francisco pizarro"], clues:[
+      "Conquistador español nacido en Trujillo, Extremadura, hacia 1478, de origen humilde y analfabeto.",
+      "Exploró la costa del Pacífico sudamericano durante años en busca de un legendario reino rico en oro.",
+      "Aprovechó una guerra civil entre dos hermanos por el trono del Imperio inca para debilitar a sus rivales.",
+      "Capturó al emperador Atahualpa en Cajamarca con apenas un puñado de soldados, en 1532.",
+      "Fundó la ciudad de Lima y se convirtió en gobernador del recién conquistado virreinato del Perú."
+    ]},
+    {name:"Leonardo da Vinci", aliases:["leonardo da vinci","leonardo"], clues:[
+      "Artista e inventor nacido en 1452 cerca de Florencia, hijo ilegítimo de un notario y una campesina.",
+      "Trabajó como pintor, escultor e ingeniero para varias cortes italianas y para el rey de Francia.",
+      "Llenó miles de páginas de cuadernos con estudios de anatomía, ingeniería y diseños que se adelantaban siglos a su época.",
+      "Pintó un célebre retrato de una dama florentina cuya sonrisa sigue fascinando a millones de visitantes en el Louvre.",
+      "Pintó también un famoso fresco sobre la última cena de Jesús con sus apóstoles en un convento de Milán."
+    ]},
+    {name:"Miguel Ángel", aliases:["miguel angel","michelangelo","miguel angel buonarroti"], clues:[
+      "Escultor, pintor y arquitecto nacido en la Toscana en 1475, considerado desde joven un prodigio artístico.",
+      "Esculpió en mármol una gigantesca estatua bíblica que hoy se exhibe en Florencia, símbolo de la ciudad.",
+      "Pintó tumbado sobre un andamio el techo de una capilla del Vaticano durante varios años.",
+      "Aquel techo representa escenas del Génesis, entre ellas la creación de Adán con las manos casi tocándose.",
+      "Diseñó también la gran cúpula de la basílica de San Pedro en Roma, obra culminada tras su muerte."
+    ]},
+    {name:"Nicolás Copérnico", aliases:["nicolas copernico","copernico"], clues:[
+      "Astrónomo y clérigo polaco nacido en 1473, que combinó sus estudios científicos con tareas administrativas eclesiásticas.",
+      "Pasó décadas desarrollando en secreto una teoría que contradecía la visión aceptada del universo desde la Antigüedad.",
+      "Propuso que el Sol, y no la Tierra, ocupaba el centro del sistema planetario conocido.",
+      "Publicó su teoría en un libro que solo vio impreso poco antes de morir, temeroso de la reacción de la Iglesia.",
+      "Su teoría heliocéntrica sentó las bases de la revolución científica continuada después por Galileo y Kepler."
+    ]},
+    {name:"Galileo Galilei", aliases:["galileo galilei","galileo"], clues:[
+      "Científico italiano nacido en Pisa en 1564, que estudió medicina antes de dedicarse a las matemáticas y la astronomía.",
+      "Perfeccionó un instrumento óptico recién inventado en Holanda, que le permitió observar el cielo con gran detalle.",
+      "Descubrió cuatro lunas orbitando alrededor de Júpiter, prueba de que no todo giraba en torno a la Tierra.",
+      "Defendió públicamente el modelo heliocéntrico de Copérnico, lo que le llevó a ser juzgado por la Inquisición.",
+      "Se le atribuye la frase 'y sin embargo se mueve', pronunciada tras verse obligado a retractarse ante el tribunal."
+    ]},
+    {name:"Martín Lutero", aliases:["martin lutero"], clues:[
+      "Monje agustino y teólogo alemán nacido en 1483, que estudió derecho antes de ingresar en un monasterio.",
+      "Se opuso públicamente a la venta de indulgencias por parte de la Iglesia católica para financiar sus obras.",
+      "Clavó, según la tradición, un documento con sus objeciones en la puerta de una iglesia de Wittenberg en 1517.",
+      "Tradujo la Biblia al alemán, contribuyendo a estandarizar la lengua y a difundir sus ideas entre el pueblo.",
+      "Su ruptura con Roma dio origen a la Reforma protestante, dividiendo el cristianismo occidental durante siglos."
+    ]},
+    {name:"Enrique VIII", aliases:["enrique viii"], clues:[
+      "Rey de Inglaterra nacido en 1491, que subió al trono tras la muerte prematura de su hermano mayor.",
+      "Se casó con la viuda de aquel hermano, la primera de sus seis esposas a lo largo de su vida.",
+      "Pidió al Papa la anulación de ese matrimonio para poder casarse de nuevo, ante la falta de un heredero varón.",
+      "Al negarse el Papa, rompió con la Iglesia católica y se declaró jefe supremo de una nueva Iglesia nacional.",
+      "Fundó la Iglesia de Inglaterra y es recordado también por haber mandado ejecutar a dos de sus seis esposas."
+    ]},
+    {name:"Isabel I de Inglaterra", aliases:["isabel i de inglaterra","isabel i","reina isabel i"], clues:[
+      "Hija de Enrique VIII y de su segunda esposa, nació en 1533 y fue declarada ilegítima durante parte de su infancia.",
+      "Subió al trono en 1558 en un reino dividido religiosamente entre católicos y protestantes.",
+      "Nunca se casó, ganándose el sobrenombre de 'la Reina Virgen', lo que despertó incertidumbre sobre la sucesión.",
+      "Derrotó a la poderosa armada naval enviada por el rey de España Felipe II en 1588.",
+      "Su largo reinado coincidió con el esplendor cultural de autores como William Shakespeare."
+    ]},
+    {name:"Suleimán el Magnífico", aliases:["suleiman el magnifico","solimanel magnifico","suleiman i"], clues:[
+      "Sultán otomano que subió al trono en 1520, en el momento de máxima expansión de su imperio.",
+      "Extendió sus dominios por tres continentes, llegando a sitiar la ciudad de Viena, en el corazón de Europa.",
+      "Reformó profundamente el sistema legal de su imperio, ganándose entre los suyos el sobrenombre de 'el Legislador'.",
+      "Impulsó grandes obras arquitectónicas en Estambul junto a su célebre arquitecto de corte.",
+      "Gobernó el Imperio otomano en su periodo de mayor esplendor cultural, militar y territorial."
+    ]},
+    {name:"Iván el Terrible", aliases:["ivan el terrible","ivan iv"], clues:[
+      "Gran príncipe de Moscú nacido en 1530, que perdió a sus padres siendo todavía niño en medio de intrigas cortesanas.",
+      "Fue coronado en 1547 con un nuevo título imperial que situaba a su Estado al nivel de los grandes imperios.",
+      "Expandió notablemente el territorio ruso hacia el este, iniciando la conquista de Siberia.",
+      "Su reinado se volvió cada vez más brutal, marcado por purgas violentas contra la nobleza rusa.",
+      "Fue el primer gobernante ruso coronado zar, título que da origen a su apodo por su carácter despiadado."
+    ]},
+    {name:"William Shakespeare", aliases:["william shakespeare","shakespeare"], clues:[
+      "Dramaturgo inglés nacido en 1564 en la localidad de Stratford-upon-Avon, hijo de un comerciante de guantes.",
+      "Se trasladó a Londres, donde trabajó como actor y autor teatral para varias compañías de la época isabelina.",
+      "Escribió tragedias sobre un príncipe danés que duda si vengar la muerte de su padre y sobre unos amantes de Verona.",
+      "Fue copropietario de un famoso teatro circular londinense donde se estrenaban sus obras.",
+      "Está considerado el escritor más influyente en lengua inglesa, autor de 'Hamlet', 'Macbeth' y 'Romeo y Julieta'."
+    ]},
+    {name:"Miguel de Cervantes", aliases:["miguel de cervantes","cervantes"], clues:[
+      "Escritor español nacido en Alcalá de Henares en 1547, que combatió como soldado en la batalla naval de Lepanto.",
+      "Perdió el uso de una mano en aquella batalla, por lo que fue apodado 'el manco de Lepanto'.",
+      "Fue capturado por piratas berberiscos y pasó cinco años cautivo en Argel antes de ser rescatado.",
+      "Publicó en 1605 la primera parte de una novela sobre un hidalgo que enloquece leyendo libros de caballerías.",
+      "Es autor de 'Don Quijote de la Mancha', considerada la primera gran novela moderna de la literatura occidental."
+    ]},
+    {name:"René Descartes", aliases:["rene descartes","descartes"], clues:[
+      "Filósofo y matemático francés nacido en 1596, educado en un colegio jesuita antes de estudiar derecho.",
+      "Sirvió como soldado en varios ejércitos europeos antes de dedicarse por completo a la filosofía y las matemáticas.",
+      "Buscó un método para dudar de todo aquello que pudiera ser puesto en cuestión, hasta llegar a una certeza inicial.",
+      "Formuló una célebre frase que resume su punto de partida filosófico sobre la existencia del pensamiento.",
+      "Es considerado el padre de la filosofía moderna, autor de la frase 'pienso, luego existo'."
+    ]},
+    {name:"Isaac Newton", aliases:["isaac newton","newton"], clues:[
+      "Científico inglés nacido en 1643, que se refugió en la granja familiar cuando una epidemia de peste cerró su universidad.",
+      "Durante ese retiro forzoso desarrolló ideas fundamentales sobre la luz, el cálculo y la gravitación.",
+      "Se dice, aunque probablemente sea una leyenda, que una manzana cayendo de un árbol le inspiró su teoría más famosa.",
+      "Formuló las leyes que describen el movimiento de los cuerpos y la fuerza que mantiene a los planetas en órbita.",
+      "Publicó los 'Principia Mathematica', una de las obras científicas más influyentes de la historia."
+    ]},
+    {name:"Luis XIV", aliases:["luis xiv","rey sol"], clues:[
+      "Rey de Francia coronado siendo apenas un niño de cuatro años, en 1643, tras la muerte de su padre.",
+      "Gobernó personalmente durante más de setenta años, el reinado más largo de la historia de Europa.",
+      "Centralizó el poder político en su persona, afirmando que él mismo encarnaba al Estado.",
+      "Construyó un enorme palacio a las afueras de París donde obligaba a residir a gran parte de la nobleza francesa.",
+      "Fue conocido como 'el Rey Sol' y convirtió el palacio de Versalles en símbolo del absolutismo europeo."
+    ]},
+    {name:"Pedro el Grande", aliases:["pedro el grande","pedro i de rusia"], clues:[
+      "Zar ruso nacido en 1672, que compartió el trono con su medio hermano durante su infancia y adolescencia.",
+      "Viajó de incógnito por Europa occidental, trabajando incluso como carpintero en astilleros holandeses para aprender técnicas navales.",
+      "Modernizó a la fuerza las instituciones, el ejército y las costumbres de su país siguiendo modelos europeos.",
+      "Fundó una nueva capital a orillas del mar Báltico, construida sobre terrenos pantanosos con enorme coste humano.",
+      "Fundó la ciudad de San Petersburgo y transformó Rusia en una potencia europea de primer orden."
+    ]},
+    {name:"Catalina la Grande", aliases:["catalina la grande","catalina ii"], clues:[
+      "Princesa alemana nacida en 1729, que se trasladó a Rusia tras ser prometida en matrimonio a un heredero al trono.",
+      "Derrocó a su propio esposo, el zar Pedro III, poco después de que este subiera al trono.",
+      "Se correspondió por carta con destacados pensadores de la Ilustración francesa como Voltaire.",
+      "Expandió notablemente el territorio ruso hacia el sur y el oeste durante su largo reinado.",
+      "Gobernó Rusia durante más de tres décadas como una de las grandes monarcas ilustradas de Europa."
+    ]},
+    {name:"Voltaire", aliases:["voltaire","francois marie arouet"], clues:[
+      "Escritor francés nacido en 1694 con el nombre de François-Marie Arouet, hijo de un notario parisino.",
+      "Fue encarcelado en la Bastilla y más tarde desterrado a Inglaterra tras ofender a un noble influyente.",
+      "Defendió la tolerancia religiosa y la libertad de expresión a través de innumerables ensayos, cartas y obras satíricas.",
+      "Escribió una célebre novela filosófica sobre un joven optimista que sufre toda clase de desgracias.",
+      "Es autor de 'Cándido' y uno de los grandes símbolos de la Ilustración francesa, célebre por su ingenio corrosivo."
+    ]},
+    {name:"Benjamin Franklin", aliases:["benjamin franklin"], clues:[
+      "Impresor y científico estadounidense nacido en Boston en 1706, autodidacta que llegó a fundar periódicos y bibliotecas públicas.",
+      "Realizó un célebre experimento con una cometa durante una tormenta para demostrar la naturaleza eléctrica de los rayos.",
+      "Inventó el pararrayos, las lentes bifocales y una estufa que aún lleva su nombre.",
+      "Fue enviado como diplomático a Francia para obtener apoyo militar durante la guerra de independencia de su país.",
+      "Fue uno de los padres fundadores de Estados Unidos y firmante de la Declaración de Independencia."
+    ]},
+    {name:"George Washington", aliases:["george washington"], clues:[
+      "Terrateniente y militar nacido en Virginia en 1732, que combatió de joven en la guerra franco-india.",
+      "Fue nombrado comandante en jefe del ejército continental durante la guerra de independencia contra Gran Bretaña.",
+      "Presidió la convención que redactó la nueva constitución del país tras la independencia.",
+      "Se convirtió en el primer presidente de la nueva nación en 1789, renunciando voluntariamente a un tercer mandato.",
+      "Da nombre a la capital de Estados Unidos y aparece retratado en el billete de un dólar."
+    ]},
+    {name:"Napoleón Bonaparte", aliases:["napoleon bonaparte","napoleon"], clues:[
+      "Militar nacido en Córcega en 1769, que ascendió rápidamente en el ejército francés tras la Revolución.",
+      "Dio un golpe de Estado en 1799 y se proclamó primero cónsul, y años después emperador de los franceses.",
+      "Reformó profundamente el sistema legal francés a través de un código civil que aún influye en muchas legislaciones actuales.",
+      "Conquistó gran parte de Europa continental antes de sufrir una desastrosa campaña militar en Rusia.",
+      "Fue derrotado definitivamente en la batalla de Waterloo en 1815 y murió exiliado en la isla de Santa Elena."
+    ]},
+    {name:"Maximilien Robespierre", aliases:["maximilien robespierre","robespierre"], clues:[
+      "Abogado y político francés nacido en 1758, elegido diputado en los primeros años de la Revolución francesa.",
+      "Se convirtió en una de las figuras más influyentes del club político jacobino durante la Revolución.",
+      "Lideró un periodo de represión política conocido como el Terror, con miles de ejecuciones en la guillotina.",
+      "Defendía una república basada en la virtud cívica, aunque sus métodos generaron un miedo generalizado.",
+      "Fue arrestado y guillotinado en 1794 por sus propios antiguos aliados, poniendo fin al periodo del Terror."
+    ]},
+    {name:"Marie Antoinette", aliases:["maria antonieta","marie antoinette"], clues:[
+      "Archiduquesa austríaca nacida en 1755, casada muy joven con el futuro rey de Francia por razones de alianza política.",
+      "Se convirtió en reina consorte de Francia y fue objeto de una intensa impopularidad por su vida de lujo.",
+      "Se le atribuye, probablemente de forma falsa, la frase 'que coman pasteles' ante la falta de pan del pueblo.",
+      "Intentó huir de Francia junto a su familia durante la Revolución, pero fue detenida cerca de la frontera.",
+      "Fue guillotinada en 1793, meses después que su esposo, el rey Luis XVI."
+    ]},
+    {name:"Mozart", aliases:["mozart","wolfgang amadeus mozart"], clues:[
+      "Compositor nacido en Salzburgo en 1756, que ya componía y actuaba en público antes de cumplir los seis años.",
+      "Recorrió las principales cortes europeas de niño junto a su padre, exhibiendo su prodigioso talento musical.",
+      "Compuso óperas, sinfonías y conciertos con una facilidad y rapidez que asombraban a sus contemporáneos.",
+      "Escribió obras como 'La flauta mágica' y 'Las bodas de Fígaro' en los últimos años de su corta vida.",
+      "Murió en Viena en 1791 con apenas 35 años, dejando inacabado su célebre Réquiem."
+    ]},
+    {name:"Beethoven", aliases:["beethoven","ludwig van beethoven"], clues:[
+      "Compositor nacido en Bonn en 1770, formado desde niño por un padre exigente que veía en él un futuro prodigio.",
+      "Se trasladó a Viena para estudiar con compositores como Haydn, ciudad donde desarrollaría casi toda su carrera.",
+      "Comenzó a perder la audición en su treintena, un drama que ocultó durante años por miedo al rechazo público.",
+      "Continuó componiendo algunas de sus obras más célebres estando ya completamente sordo.",
+      "Es autor de nueve sinfonías, entre ellas la Novena, con su famoso 'Himno a la alegría'."
+    ]},
+    {name:"Simón Bolívar", aliases:["simon bolivar"], clues:[
+      "Militar y político nacido en Caracas en 1783, en el seno de una acaudalada familia criolla venezolana.",
+      "Quedó huérfano siendo niño y viajó por Europa, donde se familiarizó con las ideas ilustradas y republicanas.",
+      "Lideró numerosas campañas militares contra el dominio colonial español a lo largo de Sudamérica.",
+      "Sus victorias contribuyeron a la independencia de los actuales Venezuela, Colombia, Ecuador, Perú y Bolivia.",
+      "Es conocido como 'El Libertador', y un país sudamericano, Bolivia, lleva su nombre en su honor."
+    ]},
+    {name:"José de San Martín", aliases:["jose de san martin","san martin"], clues:[
+      "Militar nacido en 1778 en el actual territorio argentino, formado desde joven en el ejército español.",
+      "Regresó a Sudamérica tras años sirviendo en España para unirse a la causa de la independencia americana.",
+      "Cruzó la cordillera de los Andes con su ejército en una hazaña militar considerada extraordinaria.",
+      "Liberó Chile y más tarde entró en Lima, proclamando la independencia del Perú.",
+      "Se reunió en Guayaquil con Simón Bolívar y, tras aquel encuentro, se retiró de la vida pública y viajó a Europa."
+    ]},
+    {name:"Otto von Bismarck", aliases:["otto von bismarck","bismarck"], clues:[
+      "Aristócrata y político prusiano nacido en 1815, conocido por su estilo de gobierno pragmático y sin escrúpulos.",
+      "Se convirtió en canciller del reino de Prusia y defendió la unificación alemana mediante 'hierro y sangre'.",
+      "Provocó y ganó varias guerras contra Dinamarca, Austria y Francia para consolidar la hegemonía prusiana.",
+      "Proclamó el nuevo Imperio alemán en el palacio de Versalles tras derrotar a Francia en 1871.",
+      "Es conocido como 'el canciller de hierro', arquitecto principal de la unificación de Alemania."
+    ]},
+    {name:"Giuseppe Garibaldi", aliases:["giuseppe garibaldi","garibaldi"], clues:[
+      "Militar y revolucionario italiano nacido en Niza en 1807, combatiente por causas republicanas en Europa y Sudamérica.",
+      "Luchó primero en guerras de independencia en Brasil y Uruguay antes de regresar a su Italia natal.",
+      "Lideró una célebre expedición con apenas mil voluntarios vestidos de rojo para conquistar el sur de Italia.",
+      "Entregó los territorios conquistados al rey de Piamonte, renunciando al poder personal en favor de la unidad italiana.",
+      "Es considerado uno de los padres de la unificación de Italia, célebre por sus 'camisas rojas'."
+    ]},
+    {name:"Karl Marx", aliases:["karl marx"], clues:[
+      "Filósofo y economista nacido en Tréveris, Alemania, en 1818, en el seno de una familia judía convertida al protestantismo.",
+      "Vivió gran parte de su vida exiliado en Bruselas, París y finalmente Londres, huyendo de la persecución política.",
+      "Escribió junto a su colaborador Friedrich Engels un breve manifiesto que se convertiría en un texto revolucionario clave.",
+      "Desarrolló una crítica sistemática del capitalismo en una extensa obra sobre economía política.",
+      "Es autor de 'El capital' y del 'Manifiesto comunista', y su pensamiento inspiró revoluciones en todo el mundo."
+    ]},
+    {name:"Charles Darwin", aliases:["charles darwin","darwin"], clues:[
+      "Naturalista inglés nacido en 1809, que abandonó sus estudios de medicina para dedicarse a la historia natural.",
+      "Se embarcó a los veintidós años en un largo viaje de exploración científica alrededor del mundo en un barco de la marina británica.",
+      "Observó en las islas Galápagos pequeñas variaciones entre especies de pinzones que le hicieron reflexionar sobre su origen.",
+      "Tardó más de veinte años en publicar su teoría, temeroso del rechazo religioso y científico que podía provocar.",
+      "Es autor de 'El origen de las especies', que sentó las bases de la teoría de la evolución por selección natural."
+    ]},
+    {name:"Louis Pasteur", aliases:["louis pasteur","pasteur"], clues:[
+      "Químico y biólogo francés nacido en 1822, hijo de un curtidor, que destacó desde joven por su meticulosidad científica.",
+      "Demostró que la fermentación y muchas enfermedades eran causadas por microorganismos, refutando la teoría de la generación espontánea.",
+      "Desarrolló un proceso de calentamiento para eliminar bacterias en líquidos como la leche, que lleva su nombre.",
+      "Creó una vacuna contra la rabia que aplicó por primera vez a un niño mordido por un perro infectado.",
+      "Dio nombre al proceso de pasteurización y es considerado uno de los padres de la microbiología moderna."
+    ]},
+    {name:"Thomas Edison", aliases:["thomas edison","edison"], clues:[
+      "Inventor estadounidense nacido en 1847, que apenas recibió educación formal y fue educado en casa por su madre.",
+      "Fundó un laboratorio de investigación dedicado a desarrollar inventos de forma sistemática y comercial.",
+      "Perfeccionó la bombilla incandescente hasta hacerla práctica y duradera para el uso doméstico.",
+      "Registró a lo largo de su vida más de mil patentes, entre ellas el fonógrafo y mejoras al cine primitivo.",
+      "Fundó la compañía que con el tiempo se convertiría en General Electric, una de las mayores empresas del mundo."
+    ]},
+    {name:"Nikola Tesla", aliases:["nikola tesla","tesla"], clues:[
+      "Ingeniero e inventor nacido en 1856 en el territorio del actual Croacia, entonces parte del Imperio austrohúngaro.",
+      "Emigró a Estados Unidos, donde trabajó brevemente para Thomas Edison antes de convertirse en su rival comercial.",
+      "Desarrolló y promovió el sistema de corriente alterna frente al de corriente continua defendido por Edison.",
+      "Realizó experimentos espectaculares con electricidad de alto voltaje y soñó con transmitir energía de forma inalámbrica.",
+      "Murió en la pobreza relativa en 1943, pero hoy es recordado como uno de los grandes genios de la electricidad, y una marca de coches lleva su nombre."
+    ]},
+    {name:"Florence Nightingale", aliases:["florence nightingale"], clues:[
+      "Enfermera británica nacida en Florencia, Italia, en 1820, en una familia acomodada que se opuso a su vocación.",
+      "Viajó con un grupo de enfermeras a atender a los soldados heridos durante la guerra de Crimea.",
+      "Redujo drásticamente la mortalidad en los hospitales militares aplicando estrictas medidas de higiene.",
+      "Recorría los pabellones de noche con una lámpara, lo que le valió un apodo poético entre los soldados.",
+      "Es considerada la fundadora de la enfermería moderna, conocida como 'la dama de la lámpara'."
+    ]},
+    {name:"Frédéric Chopin", aliases:["frederic chopin","chopin"], clues:[
+      "Compositor y pianista nacido cerca de Varsovia en 1810, considerado un prodigio del piano desde su infancia.",
+      "Se estableció en París tras un levantamiento nacional en su país, donde desarrolló casi toda su carrera.",
+      "Mantuvo una larga relación sentimental con la escritora francesa que firmaba bajo el seudónimo de George Sand.",
+      "Compuso casi exclusivamente para piano, incluyendo nocturnos, mazurcas y polonesas de gran refinamiento.",
+      "Murió de tuberculosis en París a los 39 años, y su corazón fue trasladado y enterrado en su Polonia natal."
+    ]},
+    {name:"León Tolstói", aliases:["leon tolstoi","tolstoi","lev tolstoi"], clues:[
+      "Escritor ruso nacido en 1828 en el seno de una familia aristocrática, criado en la finca familiar de Yasnaia Poliana.",
+      "Sirvió como oficial de artillería durante la guerra de Crimea antes de dedicarse plenamente a la literatura.",
+      "Escribió una monumental novela ambientada durante las guerras napoleónicas en Rusia, con cientos de personajes.",
+      "En sus últimos años desarrolló una profunda crítica moral y religiosa que influyó en pensadores como Gandhi.",
+      "Es autor de 'Guerra y paz' y 'Ana Karenina', dos de las cumbres de la novela realista del siglo XIX."
+    ]},
+    {name:"Fiódor Dostoyevski", aliases:["fiodor dostoyevski","dostoievski","dostoyevski"], clues:[
+      "Escritor ruso nacido en Moscú en 1821, hijo de un médico de un hospital para pobres de la ciudad.",
+      "Fue condenado a muerte por actividades revolucionarias, pero su pena se conmutó minutos antes del fusilamiento.",
+      "Pasó años en un campo de trabajos forzados en Siberia, una experiencia que marcó profundamente su obra posterior.",
+      "Sufría de epilepsia y de una fuerte adicción al juego que le acarreó graves problemas económicos.",
+      "Es autor de 'Crimen y castigo' y 'Los hermanos Karamázov', obras cumbre de la literatura psicológica rusa."
+    ]},
+    {name:"Charles Dickens", aliases:["charles dickens","dickens"], clues:[
+      "Escritor inglés nacido en 1812, que tuvo que trabajar en una fábrica siendo niño cuando su padre fue encarcelado por deudas.",
+      "Aquella dura experiencia infantil marcó profundamente muchos de los temas sociales de su obra posterior.",
+      "Publicó gran parte de sus novelas por entregas en revistas, generando enorme expectación entre sus lectores.",
+      "Escribió sobre huérfanos, injusticias sociales y la dura vida en la Inglaterra victoriana industrial.",
+      "Es autor de 'Oliver Twist' y 'Cuento de Navidad', con su famoso personaje avaro Ebenezer Scrooge."
+    ]},
+    {name:"Victor Hugo", aliases:["victor hugo"], clues:[
+      "Escritor francés nacido en 1802, figura central del movimiento romántico en la literatura francesa.",
+      "Se opuso públicamente al golpe de Estado de Napoleón III, lo que le obligó a exiliarse durante casi veinte años.",
+      "Escribió una extensa novela sobre un exconvicto perseguido durante años por un implacable inspector de policía.",
+      "Escribió también sobre un campanero deforme enamorado de una joven gitana en la catedral de París.",
+      "Es autor de 'Los miserables' y 'Nuestra Señora de París', dos pilares de la literatura francesa del siglo XIX."
+    ]},
+    {name:"Abraham Lincoln", aliases:["abraham lincoln","lincoln"], clues:[
+      "Nacido en una cabaña de troncos en Kentucky en 1809, se formó como abogado de manera prácticamente autodidacta.",
+      "Fue elegido presidente de Estados Unidos en 1860, lo que precipitó la secesión de varios estados del sur.",
+      "Lideró al país durante la sangrienta guerra civil entre la Unión y los estados confederados esclavistas.",
+      "Firmó una proclamación que declaraba libres a los esclavos de los territorios rebeldes en 1863.",
+      "Fue asesinado por un actor simpatizante confederado en un teatro de Washington en 1865, poco después de terminar la guerra."
+    ]},
+    {name:"Frederick Douglass", aliases:["frederick douglass"], clues:[
+      "Nacido esclavo en Maryland hacia 1818, aprendió a leer y escribir en secreto durante su infancia y juventud.",
+      "Logró escapar de la esclavitud disfrazado de marinero, alcanzando la libertad en el norte de Estados Unidos.",
+      "Se convirtió en un orador extraordinario, viajando por el país y por Europa para denunciar la esclavitud.",
+      "Publicó una autobiografía que se convirtió en una de las obras más influyentes del movimiento abolicionista.",
+      "Fue asesor de varios presidentes estadounidenses y uno de los grandes líderes del movimiento contra la esclavitud."
+    ]},
+    {name:"Harriet Tubman", aliases:["harriet tubman"], clues:[
+      "Nacida esclava en Maryland hacia 1822, sufrió una lesión craneal de joven por defender a otro esclavo.",
+      "Escapó ella misma de la esclavitud y regresó repetidamente al sur para ayudar a huir a otros esclavos.",
+      "Utilizó una red clandestina de rutas y refugios seguros conocida como el 'ferrocarril subterráneo'.",
+      "Sirvió como espía y exploradora para el ejército de la Unión durante la guerra civil estadounidense.",
+      "Es un símbolo de la lucha contra la esclavitud, y su rostro aparecerá en un futuro billete estadounidense de veinte dólares."
+    ]},
+    {name:"Mahatma Gandhi", aliases:["mahatma gandhi","gandhi","mohandas gandhi"], clues:[
+      "Abogado indio nacido en 1869, que ejerció su profesión durante años en Sudáfrica, donde sufrió discriminación racial.",
+      "Desarrolló allí un método de resistencia basado en la desobediencia civil pacífica frente a leyes injustas.",
+      "Regresó a la India y lideró marchas masivas contra el dominio colonial británico, entre ellas una famosa caminata hasta el mar para producir sal.",
+      "Promovió el boicot a productos británicos y el uso de ropa hilada a mano como símbolo de autosuficiencia.",
+      "Fue asesinado en 1948 tras lograr la independencia de la India, y es conocido como 'el Mahatma', que significa 'gran alma'."
+    ]},
+    {name:"Nelson Mandela", aliases:["nelson mandela","mandela"], clues:[
+      "Abogado sudafricano nacido en 1918 en el seno de una familia de la realeza xhosa.",
+      "Se unió a un movimiento contra el sistema de segregación racial vigente en su país desde mediados del siglo XX.",
+      "Fue encarcelado durante veintisiete años, gran parte de ellos en una prisión de la isla de Robben.",
+      "Fue liberado en 1990 y negoció el fin pacífico de aquel sistema de segregación con el gobierno sudafricano.",
+      "Se convirtió en el primer presidente negro de Sudáfrica en 1994, símbolo mundial de la reconciliación."
+    ]},
+    {name:"Martin Luther King", aliases:["martin luther king","martin luther king jr"], clues:[
+      "Pastor baptista nacido en Atlanta en 1929, que se convirtió en líder del movimiento por los derechos civiles en Estados Unidos.",
+      "Organizó boicots y marchas pacíficas inspiradas en los métodos de resistencia no violenta de Gandhi.",
+      "Pronunció un célebre discurso ante el monumento a Lincoln en Washington sobre su sueño de igualdad racial.",
+      "Recibió el Premio Nobel de la Paz en 1964 por su lucha contra la segregación racial en Estados Unidos.",
+      "Fue asesinado en Memphis en 1968, y su discurso 'I have a dream' es uno de los más recordados de la historia."
+    ]},
+    {name:"Emiliano Zapata", aliases:["emiliano zapata"], clues:[
+      "Campesino mexicano nacido en el estado de Morelos en 1879, que desde joven defendió los derechos de tierra de los campesinos.",
+      "Lideró un ejército campesino durante la Revolución mexicana bajo el lema 'Tierra y Libertad'.",
+      "Redactó un plan que exigía la devolución de tierras arrebatadas a las comunidades indígenas y campesinas.",
+      "Entró triunfante en la Ciudad de México junto a otro célebre revolucionario del norte del país.",
+      "Fue asesinado en una emboscada en 1919, convertido en símbolo del campesinado y la reforma agraria en México."
+    ]},
+    {name:"Mao Zedong", aliases:["mao zedong","mao tse tung","mao"], clues:[
+      "Nacido en una familia campesina de la provincia de Hunan, China, en 1893, fue cofundador del Partido Comunista Chino.",
+      "Lideró una épica retirada militar de miles de kilómetros conocida como la Larga Marcha para escapar de sus enemigos.",
+      "Ganó la guerra civil china contra el gobierno nacionalista, que se refugió finalmente en la isla de Taiwán.",
+      "Proclamó la República Popular China en 1949 e impulsó campañas de colectivización que causaron enormes hambrunas.",
+      "Gobernó China hasta su muerte en 1976 y su retrato aún preside la plaza de Tiananmén en Pekín."
+    ]},
+    {name:"Ho Chi Minh", aliases:["ho chi minh"], clues:[
+      "Revolucionario vietnamita nacido en 1890, que vivió años exiliado en Francia, la Unión Soviética y China.",
+      "Fundó un movimiento independentista que luchó primero contra el dominio colonial francés en Indochina.",
+      "Proclamó la independencia de Vietnam citando en su discurso la declaración de independencia estadounidense.",
+      "Lideró la resistencia del norte de Vietnam durante la posterior guerra contra Estados Unidos y sus aliados survietnamitas.",
+      "Murió en 1969 antes de ver la reunificación de su país, y la ciudad de Saigón fue rebautizada con su nombre."
+    ]},
+    {name:"Che Guevara", aliases:["che guevara","ernesto che guevara","ernesto guevara"], clues:[
+      "Médico argentino nacido en 1928, que recorrió gran parte de Sudamérica en motocicleta durante su juventud.",
+      "Se unió en México a un grupo de exiliados cubanos que planeaban derrocar al gobierno de su país.",
+      "Participó como guerrillero en la revolución cubana que llevó a Fidel Castro al poder en 1959.",
+      "Ocupó cargos importantes en el nuevo gobierno cubano antes de dejarlo todo para impulsar revoluciones en otros países.",
+      "Fue capturado y ejecutado en Bolivia en 1967, convirtiéndose en un icono mundial de la revolución."
+    ]},
+    {name:"Fidel Castro", aliases:["fidel castro"], clues:[
+      "Abogado cubano nacido en 1926, que lideró un fallido asalto a un cuartel militar en 1953.",
+      "Organizó desde el exilio una guerrilla que desembarcó en Cuba a bordo de un pequeño yate llamado Granma.",
+      "Derrocó al dictador cubano Fulgencio Batista en 1959 tras una campaña guerrillera en la sierra Maestra.",
+      "Instauró un gobierno socialista en la isla que resistió el aislamiento y las tensiones con Estados Unidos durante décadas.",
+      "Gobernó Cuba durante casi cinco décadas hasta ceder el poder a su hermano Raúl en 2008."
+    ]},
+    {name:"Winston Churchill", aliases:["winston churchill","churchill"], clues:[
+      "Político británico nacido en 1874 en el palacio de Blenheim, hijo de un aristócrata y una madre estadounidense.",
+      "Trabajó como corresponsal de guerra y militar antes de dedicarse por completo a la política.",
+      "Se convirtió en primer ministro del Reino Unido en 1940, en el momento más crítico de la Segunda Guerra Mundial.",
+      "Pronunció discursos memorables que reforzaron la moral británica durante los bombardeos alemanes sobre Londres.",
+      "Recibió el Premio Nobel de Literatura y es recordado por su gesto de la victoria con dos dedos en forma de V."
+    ]},
+    {name:"Franklin D. Roosevelt", aliases:["franklin d roosevelt","franklin roosevelt","fdr"], clues:[
+      "Político estadounidense nacido en 1882, que quedó parcialmente paralítico tras contraer poliomielitis siendo adulto.",
+      "Fue elegido presidente en 1932, en plena Gran Depresión económica que había hundido al país.",
+      "Impulsó un ambicioso programa de reformas económicas y sociales conocido como el 'Nuevo Trato'.",
+      "Condujo a Estados Unidos a través de la Segunda Guerra Mundial tras el ataque japonés a Pearl Harbor.",
+      "Es el único presidente estadounidense elegido cuatro veces, y murió en el cargo poco antes de acabar la guerra."
+    ]},
+    {name:"Adolf Hitler", aliases:["adolf hitler","hitler"], clues:[
+      "Nacido en Austria en 1889, intentó sin éxito ser admitido en una academia de bellas artes en Viena.",
+      "Combatió como soldado raso en el ejército alemán durante la Primera Guerra Mundial.",
+      "Lideró un partido político de extrema derecha que llegó al poder en Alemania en 1933 en medio de una grave crisis económica.",
+      "Impulsó políticas racistas radicales que desembocaron en el genocidio sistemático de millones de judíos europeos.",
+      "Desencadenó la Segunda Guerra Mundial al invadir Polonia en 1939 y se suicidó en Berlín en 1945."
+    ]},
+    {name:"Iósif Stalin", aliases:["iosif stalin","stalin","jose stalin"], clues:[
+      "Nacido en Georgia en 1878, hijo de un zapatero, estudió inicialmente para convertirse en sacerdote ortodoxo.",
+      "Se unió al movimiento bolchevique y adoptó un seudónimo revolucionario que significa 'hombre de acero'.",
+      "Se convirtió en el líder indiscutible de la Unión Soviética tras la muerte de Lenin, eliminando a sus rivales políticos.",
+      "Impulsó una industrialización acelerada del país mediante colectivizaciones forzosas que causaron hambrunas masivas.",
+      "Dirigió a la Unión Soviética durante la Segunda Guerra Mundial y gobernó con mano de hierro hasta su muerte en 1953."
+    ]},
+    {name:"Vladimir Lenin", aliases:["vladimir lenin","lenin"], clues:[
+      "Revolucionario ruso nacido en 1870, cuyo hermano mayor fue ejecutado por participar en un complot contra el zar.",
+      "Pasó años exiliado en Europa desarrollando su interpretación revolucionaria del marxismo.",
+      "Regresó a Rusia en un tren sellado facilitado por Alemania en plena Primera Guerra Mundial.",
+      "Lideró la revolución bolchevique de octubre de 1917 que derrocó al gobierno provisional ruso.",
+      "Fundó la Unión Soviética, el primer Estado comunista de la historia, gobernándolo hasta su muerte en 1924."
+    ]},
+    {name:"Charles de Gaulle", aliases:["charles de gaulle","de gaulle"], clues:[
+      "Militar francés nacido en 1890, que fue capturado y pasó gran parte de la Primera Guerra Mundial como prisionero.",
+      "Se negó a aceptar la rendición de Francia ante la Alemania nazi y lanzó una llamada a la resistencia desde Londres.",
+      "Lideró el movimiento de la Francia Libre durante la ocupación alemana de su país.",
+      "Regresó triunfante a un París liberado en 1944 tras el desembarco aliado en Normandía.",
+      "Se convirtió más tarde en presidente de Francia, fundador de la Quinta República francesa."
+    ]},
+    {name:"Albert Einstein", aliases:["albert einstein","einstein"], clues:[
+      "Físico nacido en Ulm, Alemania, en 1879, que tuvo dificultades para encontrar empleo académico tras graduarse.",
+      "Trabajó como empleado en una oficina de patentes suiza mientras desarrollaba sus primeras grandes teorías físicas.",
+      "Publicó en 1905 varios artículos revolucionarios, entre ellos uno sobre la relación entre masa y energía.",
+      "Formuló una célebre ecuación que relaciona la energía, la masa y la velocidad de la luz.",
+      "Desarrolló la teoría de la relatividad y recibió el Premio Nobel de Física, convirtiéndose en el científico más popular del siglo XX."
+    ]},
+    {name:"Sigmund Freud", aliases:["sigmund freud","freud"], clues:[
+      "Médico neurólogo nacido en Moravia, en el Imperio austrohúngaro, en 1856, que se formó y ejerció principalmente en Viena.",
+      "Desarrolló un método terapéutico basado en el análisis de los sueños y las asociaciones libres del paciente.",
+      "Propuso que gran parte de nuestro comportamiento está determinado por deseos y conflictos inconscientes.",
+      "Dividió la psique humana en tres instancias, entre ellas una regida por impulsos primarios y otra por la conciencia moral.",
+      "Es considerado el padre del psicoanálisis, y tuvo que huir de Viena tras la anexión nazi de Austria."
+    ]},
+    {name:"Alexander Fleming", aliases:["alexander fleming","fleming"], clues:[
+      "Bacteriólogo escocés nacido en 1881, que sirvió como médico militar durante la Primera Guerra Mundial.",
+      "Regresó de vacaciones a su laboratorio y encontró un cultivo bacteriano contaminado por un hongo accidental.",
+      "Observó que aquel hongo había destruido las bacterias circundantes en la placa de cultivo.",
+      "Aisló la sustancia responsable de aquel efecto, aunque no logró desarrollarla comercialmente él mismo.",
+      "Descubrió la penicilina, el primer antibiótico moderno, que salvaría millones de vidas en las décadas siguientes."
+    ]},
+    {name:"Marie Curie", aliases:["marie curie","maria sklodowska curie"], clues:[
+      "Científica nacida en Varsovia en 1867, que tuvo que estudiar en secreto por la prohibición de educar a mujeres en su país.",
+      "Se trasladó a París para estudiar en la Sorbona, donde conoció a su futuro marido y colaborador científico.",
+      "Investigó junto a él un fenómeno por el que ciertos elementos emitían energía de forma espontánea.",
+      "Descubrió dos nuevos elementos químicos, uno de ellos nombrado en honor a su país de origen.",
+      "Fue la primera persona en recibir dos premios Nobel en disciplinas científicas distintas, física y química."
+    ]},
+    {name:"Alan Turing", aliases:["alan turing","turing"], clues:[
+      "Matemático británico nacido en 1912, que destacó desde joven por su talento excepcional para la lógica y las matemáticas.",
+      "Formuló un modelo teórico abstracto de una máquina capaz de realizar cualquier cálculo, sentando las bases de la computación.",
+      "Trabajó durante la Segunda Guerra Mundial descifrando los códigos secretos generados por una máquina alemana.",
+      "Su trabajo contribuyó decisivamente a acortar la guerra, aunque permaneció clasificado durante décadas.",
+      "Fue perseguido tras la guerra por su homosexualidad, entonces ilegal en el Reino Unido, y es hoy considerado el padre de la informática moderna."
+    ]},
+    {name:"Rosalind Franklin", aliases:["rosalind franklin"], clues:[
+      "Química británica nacida en Londres en 1920, especializada en la técnica de difracción de rayos X.",
+      "Trabajó en un laboratorio de Londres investigando la estructura de una molécula fundamental para la herencia biológica.",
+      "Obtuvo una fotografía crucial que reveló la forma helicoidal de aquella molécula.",
+      "Sus datos fueron utilizados por otros dos científicos sin su consentimiento para completar su propio modelo.",
+      "Su fotografía fue clave para el descubrimiento de la estructura del ADN, aunque murió antes de que otros recibieran el Nobel por ese hallazgo."
+    ]},
+    {name:"Yuri Gagarin", aliases:["yuri gagarin","gagarin"], clues:[
+      "Piloto militar soviético nacido en 1934 en una granja colectiva cerca de Moscú.",
+      "Fue seleccionado entre miles de candidatos para el incipiente programa espacial tripulado de su país.",
+      "Completó una única órbita alrededor de la Tierra a bordo de una pequeña nave espacial en 1961.",
+      "Regresó a la Tierra como un héroe nacional, símbolo del prestigio científico soviético en plena Guerra Fría.",
+      "Se convirtió en el primer ser humano en viajar al espacio, a bordo de la nave Vostok 1."
+    ]},
+    {name:"Neil Armstrong", aliases:["neil armstrong","armstrong"], clues:[
+      "Piloto de pruebas y astronauta estadounidense nacido en Ohio en 1930, veterano de la guerra de Corea.",
+      "Comandó una misión espacial que tenía como objetivo cumplir la promesa de un presidente asesinado años antes.",
+      "Pilotó manualmente el módulo de descenso ante la falta de combustible y un terreno lunar más accidentado de lo previsto.",
+      "Pronunció una célebre frase sobre un pequeño paso para un hombre y un gran salto para la humanidad.",
+      "Se convirtió en la primera persona en pisar la superficie de la Luna, en julio de 1969."
+    ]},
+    {name:"Pablo Picasso", aliases:["pablo picasso","picasso"], clues:[
+      "Pintor español nacido en Málaga en 1881, hijo de un profesor de dibujo que reconoció pronto su enorme talento.",
+      "Se trasladó a París, donde desarrolló junto a Georges Braque un revolucionario estilo pictórico fragmentado.",
+      "Pintó un enorme lienzo en blanco y negro denunciando el bombardeo de un pueblo vasco durante la guerra civil española.",
+      "Su estilo evolucionó constantemente a lo largo de su vida, desde su etapa azul hasta el cubismo y el surrealismo.",
+      "Es autor del 'Guernica' y cofundador del cubismo, uno de los artistas más prolíficos e influyentes del siglo XX."
+    ]},
+    {name:"Salvador Dalí", aliases:["salvador dali","dali"], clues:[
+      "Pintor español nacido en Figueras, Cataluña, en 1904, célebre por su extravagante personalidad pública.",
+      "Se unió al movimiento surrealista en París, aunque más tarde fue expulsado del grupo por sus posturas políticas.",
+      "Es célebre por sus característicos bigotes finos y retorcidos hacia arriba, parte de su imagen icónica.",
+      "Pintó relojes blandos derritiéndose sobre un paisaje onírico en una de sus obras más reconocibles.",
+      "Es autor de 'La persistencia de la memoria' y fundó un museo dedicado a su propia obra en su ciudad natal."
+    ]},
+    {name:"Frida Kahlo", aliases:["frida kahlo"], clues:[
+      "Pintora mexicana nacida en Coyoacán en 1907, que sufrió de niña la polio y de joven un grave accidente de autobús.",
+      "Aquel accidente le provocó lesiones permanentes que marcaron tanto su salud como su obra artística.",
+      "Se casó con el célebre muralista mexicano Diego Rivera, en una relación tan intensa como turbulenta.",
+      "Pintó numerosos autorretratos cargados de simbolismo sobre el dolor físico, la identidad y la cultura mexicana.",
+      "Es una de las pintoras más reconocidas del siglo XX, célebre por sus cejas unidas y sus tocados de flores."
+    ]},
+    {name:"Diego Rivera", aliases:["diego rivera"], clues:[
+      "Pintor mexicano nacido en Guanajuato en 1886, que estudió arte en Europa antes de regresar a su país.",
+      "Se convirtió en la figura central del movimiento muralista mexicano tras la Revolución.",
+      "Pintó enormes murales en edificios públicos que narraban la historia y las luchas sociales de México.",
+      "Estuvo casado con la pintora Frida Kahlo, en una de las relaciones artísticas más célebres del siglo XX.",
+      "Uno de sus murales para el Rockefeller Center de Nueva York fue destruido por incluir un retrato de Lenin."
+    ]},
+    {name:"Charles Chaplin", aliases:["charles chaplin","charlie chaplin","chaplin"], clues:[
+      "Actor y cineasta británico nacido en Londres en 1889, criado en la pobreza tras el internamiento de su madre por enfermedad mental.",
+      "Creó un personaje cómico con bombín, bastón y bigote que se convirtió en un icono mundial del cine mudo.",
+      "Escribió, dirigió, produjo y protagonizó la mayoría de sus propias películas desde muy joven.",
+      "Realizó una feroz sátira contra el fascismo interpretando a un dictador que parodiaba directamente a Hitler.",
+      "Fue expulsado de Estados Unidos durante la caza de brujas anticomunista, célebre por su personaje 'Charlot' o 'el vagabundo'."
+    ]},
+    {name:"Marilyn Monroe", aliases:["marilyn monroe","marilyn"], clues:[
+      "Actriz estadounidense nacida en Los Ángeles en 1926, que pasó gran parte de su infancia en orfanatos y hogares de acogida.",
+      "Comenzó su carrera como modelo antes de convertirse en una de las grandes estrellas del cine de Hollywood.",
+      "Protagonizó comedias como 'Con faldas y a lo loco' y 'Los caballeros las prefieren rubias'.",
+      "Su vestido blanco elevándose sobre una rejilla de ventilación se convirtió en una de las imágenes más icónicas del cine.",
+      "Murió en 1962 en circunstancias que aún generan debate, convertida en un símbolo eterno de Hollywood."
+    ]},
+    {name:"Elvis Presley", aliases:["elvis presley","elvis"], clues:[
+      "Cantante estadounidense nacido en Misisipi en 1935, criado en una familia humilde que se trasladó luego a Memphis.",
+      "Grabó sus primeras canciones en un pequeño estudio local que fusionaba música country con ritmos afroamericanos.",
+      "Su forma de moverse en el escenario, especialmente sus caderas, causó escándalo en la televisión de los años cincuenta.",
+      "Popularizó el rock and roll entre el público blanco estadounidense, convirtiéndose en una estrella global.",
+      "Es conocido como 'el Rey del rock and roll', y su mansión en Memphis, Graceland, recibe millones de visitas."
+    ]},
+    {name:"John Lennon", aliases:["john lennon","lennon"], clues:[
+      "Músico británico nacido en Liverpool en 1940, criado principalmente por su tía tras la separación de sus padres.",
+      "Fundó en su adolescencia una banda escolar que con el tiempo se convertiría en el grupo más influyente del pop moderno.",
+      "Compuso junto a Paul McCartney gran parte del repertorio de esa banda a lo largo de la década de 1960.",
+      "Se convirtió en un destacado activista por la paz junto a su esposa Yoko Ono tras la separación del grupo.",
+      "Fue asesinado a las puertas de su edificio en Nueva York en 1980, cofundador de The Beatles."
+    ]},
+    {name:"Bob Marley", aliases:["bob marley"], clues:[
+      "Músico jamaicano nacido en 1945, hijo de un padre blanco británico y una madre jamaicana negra.",
+      "Formó un grupo musical que fusionaba el ritmo reggae con letras de contenido social y espiritual.",
+      "Practicaba la religión rastafari, que influyó profundamente en su música y en su estilo de vida.",
+      "Sobrevivió a un intento de asesinato en Jamaica poco antes de un concierto por la paz en su país.",
+      "Es el gran embajador mundial del reggae, autor de canciones como 'No Woman, No Cry' y 'One Love'."
+    ]},
+    {name:"Ernest Hemingway", aliases:["ernest hemingway","hemingway"], clues:[
+      "Escritor estadounidense nacido en Illinois en 1899, que trabajó como conductor de ambulancias en la Primera Guerra Mundial.",
+      "Vivió como corresponsal y aficionado a los toros en España, país que marcó profundamente su obra y su vida.",
+      "Desarrolló un estilo literario directo y despojado de adornos, influyente en generaciones posteriores de escritores.",
+      "Escribió sobre un viejo pescador cubano enfrentado en solitario a un enorme pez en el golfo de México.",
+      "Recibió el Premio Nobel de Literatura, autor de 'El viejo y el mar' y 'Por quién doblan las campanas'."
+    ]},
+    {name:"Gabriel García Márquez", aliases:["gabriel garcia marquez","garcia marquez","gabo"], clues:[
+      "Escritor y periodista colombiano nacido en Aracataca en 1927, criado por sus abuelos maternos.",
+      "Trabajó como periodista en varios países antes de dedicarse plenamente a la literatura de ficción.",
+      "Desarrolló un estilo narrativo que mezclaba lo cotidiano con lo fantástico, conocido como realismo mágico.",
+      "Narró la historia de varias generaciones de la familia Buendía en el pueblo imaginario de Macondo.",
+      "Recibió el Premio Nobel de Literatura, autor de 'Cien años de soledad', apodado cariñosamente 'Gabo'."
+    ]},
+    {name:"Jorge Luis Borges", aliases:["jorge luis borges","borges"], clues:[
+      "Escritor argentino nacido en Buenos Aires en 1899, criado en una familia bilingüe que lo introdujo pronto a la literatura inglesa.",
+      "Trabajó durante años como bibliotecario en Buenos Aires antes de alcanzar reconocimiento internacional.",
+      "Perdió gradualmente la vista, heredando la misma condición que había afectado a varios miembros de su familia.",
+      "Escribió cuentos breves cargados de laberintos, espejos, bibliotecas infinitas y juegos filosóficos.",
+      "Es autor de 'Ficciones' y 'El Aleph', considerado uno de los grandes maestros del cuento en lengua española."
+    ]},
+    {name:"Pablo Neruda", aliases:["pablo neruda","neruda"], clues:[
+      "Poeta chileno nacido en Parral en 1904, que adoptó un seudónimo literario inspirado en un escritor checo.",
+      "Ejerció como diplomático chileno en varios países de Asia y Europa durante buena parte de su vida.",
+      "Se afilió al Partido Comunista y tuvo que huir de Chile a caballo cruzando la cordillera de los Andes.",
+      "Escribió tanto poesía amorosa apasionada como una extensa obra sobre la historia y la naturaleza de América.",
+      "Recibió el Premio Nobel de Literatura, autor de 'Veinte poemas de amor y una canción desesperada'."
+    ]},
+    {name:"Virginia Woolf", aliases:["virginia woolf"], clues:[
+      "Escritora británica nacida en Londres en 1882, en una familia intelectual que fomentó su temprana pasión por la lectura.",
+      "Fundó junto a su marido una pequeña editorial que publicó algunas de sus propias obras y las de otros autores destacados.",
+      "Fue una figura central de un influyente círculo de intelectuales y artistas londinenses de principios del siglo XX.",
+      "Desarrolló técnicas narrativas innovadoras como el monólogo interior, explorando el flujo de conciencia de sus personajes.",
+      "Escribió 'La señora Dalloway' y 'Un cuarto propio', y se quitó la vida en 1941 en un río cerca de su casa."
+    ]},
+    {name:"Anne Frank", aliases:["anne frank","ana frank"], clues:[
+      "Niña judía alemana nacida en Fráncfort en 1929, cuya familia emigró a los Países Bajos huyendo del nazismo.",
+      "Se ocultó junto a su familia en un anexo secreto de un edificio de Ámsterdam durante la ocupación alemana.",
+      "Escribió un diario personal dirigido a una amiga imaginaria durante los más de dos años que pasó escondida.",
+      "Fue descubierta y deportada a campos de concentración, donde murió poco antes del fin de la guerra.",
+      "Su diario fue publicado tras la guerra por su padre, superviviente, y se convirtió en un testimonio universal del Holocausto."
+    ]},
+    {name:"Rosa Parks", aliases:["rosa parks"], clues:[
+      "Costurera afroamericana nacida en Alabama en 1913, activa desde joven en organizaciones por los derechos civiles.",
+      "Se negó a ceder su asiento a un pasajero blanco en un autobús segregado de Montgomery en 1955.",
+      "Su detención por aquella negativa desencadenó un largo boicot de autobuses liderado por un joven pastor local.",
+      "Aquel pastor era Martin Luther King, cuya carrera como líder del movimiento por los derechos civiles despegó entonces.",
+      "Es conocida como 'la madre del movimiento de los derechos civiles' en Estados Unidos."
+    ]},
+    {name:"Anwar el Sadat", aliases:["anwar el sadat","anwar al sadat"], clues:[
+      "Militar y político egipcio nacido en 1918, que participó en el derrocamiento de la monarquía de su país.",
+      "Se convirtió en presidente de Egipto tras la muerte de su predecesor, Gamal Abdel Nasser.",
+      "Lanzó un ataque sorpresa contra Israel en 1973 para recuperar territorios perdidos en una guerra anterior.",
+      "Viajó después a Jerusalén en un gesto histórico de acercamiento hacia su antiguo enemigo.",
+      "Firmó un tratado de paz con Israel y recibió el Nobel de la Paz, antes de ser asesinado en 1981."
+    ]},
+    {name:"Golda Meir", aliases:["golda meir"], clues:[
+      "Nacida en Kiev en 1898, emigró de niña con su familia a Estados Unidos huyendo de los pogromos antisemitas.",
+      "Se trasladó más tarde a Palestina, donde participó activamente en el movimiento sionista antes de la creación de un nuevo Estado.",
+      "Fue una de las firmantes de la declaración de independencia de ese nuevo país en 1948.",
+      "Ocupó cargos ministeriales antes de convertirse en jefa de gobierno de su país en 1969.",
+      "Fue la primera mujer en ser primera ministra de Israel, apodada 'la dama de hierro' antes que Margaret Thatcher."
+    ]},
+    {name:"Indira Gandhi", aliases:["indira gandhi"], clues:[
+      "Nacida en 1917, hija del primer primer ministro de la India independiente, creció rodeada de política desde niña.",
+      "No tenía parentesco con Mahatma Gandhi, pese a compartir apellido por matrimonio con un político de ese nombre.",
+      "Se convirtió en primera ministra de la India en 1966, liderando el país durante varias décadas turbulentas.",
+      "Impuso un controvertido estado de emergencia que suspendió libertades civiles durante casi dos años.",
+      "Fue asesinada en 1984 por sus propios guardaespaldas tras ordenar un asalto militar a un templo sij."
+    ]},
+    {name:"Eva Perón", aliases:["eva peron","evita","eva duarte"], clues:[
+      "Nacida en un pueblo rural argentino en 1919, se trasladó joven a Buenos Aires para trabajar como actriz.",
+      "Se casó con un coronel que llegaría a la presidencia de Argentina, convirtiéndose en su primera dama.",
+      "Impulsó políticas sociales a favor de los trabajadores y del sufragio femenino en su país.",
+      "Fundó una fundación que repartía ayudas sociales directamente entre los sectores más pobres de Argentina.",
+      "Es conocida cariñosamente como 'Evita', y su vida inspiró un famoso musical llamado igual que su apodo."
+    ]},
+    {name:"Malcolm X", aliases:["malcolm x"], clues:[
+      "Nacido en Nebraska en 1925 con el apellido Little, su padre fue asesinado, probablemente por supremacistas blancos.",
+      "Pasó parte de su juventud en prisión, donde se convirtió al islam y adoptó un nuevo nombre.",
+      "Se convirtió en un destacado predicador de una organización religiosa afroamericana, defendiendo posturas más combativas que otros líderes del movimiento.",
+      "Realizó una peregrinación a La Meca que transformó profundamente su visión sobre la fraternidad racial.",
+      "Fue asesinado en Nueva York en 1965, coautor de su célebre autobiografía junto al escritor Alex Haley."
+    ]},
+    {name:"James Cook", aliases:["james cook","capitan cook"], clues:[
+      "Navegante y cartógrafo británico nacido en Yorkshire en 1728, hijo de un jornalero agrícola escocés.",
+      "Se enroló en la marina mercante antes de unirse a la Royal Navy, donde destacó por sus dotes de navegación.",
+      "Comandó tres largas expediciones por el océano Pacífico cartografiando costas hasta entonces desconocidas para los europeos.",
+      "Fue el primer europeo en cartografiar con precisión las costas de Nueva Zelanda y de la costa este de Australia.",
+      "Murió en un enfrentamiento con habitantes locales en las islas de Hawái en 1779, durante su tercer y último viaje."
+    ]},
+    {name:"Amelia Earhart", aliases:["amelia earhart"], clues:[
+      "Aviadora estadounidense nacida en Kansas en 1897, que trabajó como enfermera voluntaria durante la Primera Guerra Mundial.",
+      "Se convirtió en la primera mujer en cruzar el océano Atlántico en avión como pasajera, y más tarde también como piloto.",
+      "Batió numerosos récords de vuelo y se convirtió en una celebridad y símbolo de la independencia femenina.",
+      "Intentó dar la vuelta al mundo en avión junto a un navegante, sobrevolando algunos de los tramos más peligrosos del planeta.",
+      "Desapareció sin dejar rastro sobre el océano Pacífico en 1937, uno de los grandes misterios de la aviación."
+    ]},
+    {name:"Ernest Shackleton", aliases:["ernest shackleton","shackleton"], clues:[
+      "Explorador irlandés nacido en 1874, que participó en varias expediciones británicas hacia el Polo Sur.",
+      "Lideró una expedición cuyo barco quedó atrapado y finalmente aplastado por el hielo de la Antártida.",
+      "Logró mantener con vida a toda su tripulación durante meses, sobreviviendo en témpanos de hielo a la deriva.",
+      "Navegó cientos de kilómetros en un pequeño bote salvavidas hasta una isla remota para pedir ayuda.",
+      "Es célebre por lograr rescatar a toda su tripulación pese al fracaso de su expedición, a bordo del barco Endurance."
+    ]},
+    {name:"Akbar el Grande", aliases:["akbar el grande","akbar"], clues:[
+      "Emperador mogol de la India nacido en 1542, que llegó al trono siendo todavía un adolescente.",
+      "Expandió notablemente los territorios del imperio mogol a través de conquistas militares y alianzas matrimoniales.",
+      "Promovió una política de tolerancia religiosa poco habitual en su época, favoreciendo el diálogo entre hindúes y musulmanes.",
+      "Impulsó reformas administrativas y fiscales que fortalecieron enormemente la estabilidad de su imperio.",
+      "Es considerado el mayor de los emperadores mogoles, abuelo del constructor del Taj Mahal."
+    ]},
+    {name:"Shah Jahan", aliases:["shah jahan"], clues:[
+      "Emperador mogol nacido en 1592, nieto del gran emperador Akbar, que llegó al trono tras una lucha sucesoria.",
+      "Su reinado coincidió con un periodo de gran esplendor arquitectónico y cultural en el imperio mogol.",
+      "Quedó devastado por la muerte de su esposa favorita durante el parto de su decimocuarto hijo.",
+      "Ordenó construir un mausoleo de mármol blanco en su memoria, considerado una obra maestra de la arquitectura mundial.",
+      "Es el constructor del Taj Mahal, y pasó sus últimos años prisionero de su propio hijo en el fuerte de Agra."
+    ]},
+    {name:"Haile Selassie", aliases:["haile selassie"], clues:[
+      "Nacido en Etiopía en 1892 con el nombre de Tafari Makonnen, ascendió gradualmente hasta convertirse en emperador.",
+      "Su país resistió durante siglos a la colonización europea, salvo por una breve ocupación italiana en los años treinta.",
+      "Pronunció un célebre discurso ante la Sociedad de Naciones denunciando la invasión de su país por la Italia fascista.",
+      "Es considerado por el movimiento rastafari como una figura mesiánica, influyendo profundamente en esa religión jamaicana.",
+      "Gobernó Etiopía durante décadas hasta ser derrocado por un golpe militar en 1974."
+    ]},
+    {name:"Shaka Zulu", aliases:["shaka zulu","shaka"], clues:[
+      "Nacido hacia 1787 en el sur de África, hijo ilegítimo de un jefe local, vivió una infancia marcada por el rechazo.",
+      "Se formó como guerrero en un ejército vecino antes de hacerse con el liderazgo de su propio pueblo.",
+      "Reformó por completo las tácticas y el armamento militar zulú, introduciendo una lanza corta para el combate cuerpo a cuerpo.",
+      "Unificó por la fuerza a numerosos clanes rivales bajo un único y poderoso reino en el sur de África.",
+      "Fundó el poderoso reino zulú y transformó radicalmente el mapa político de la región antes de ser asesinado por sus propios hermanos."
+    ]},
+    {name:"Ada Lovelace", aliases:["ada lovelace"], clues:[
+      "Matemática británica nacida en 1815, hija única del poeta romántico Lord Byron, a quien nunca llegó a conocer bien.",
+      "Su madre, temerosa de que heredara el temperamento de su padre, la educó intensamente en matemáticas y lógica.",
+      "Colaboró con un inventor que diseñaba una máquina mecánica de cálculo, precursora teórica de los ordenadores modernos.",
+      "Escribió notas sobre esa máquina que incluían lo que hoy se considera el primer algoritmo destinado a ser ejecutado por una máquina.",
+      "Es considerada la primera programadora de la historia, y un lenguaje de programación moderno lleva su nombre."
+    ]},
+    {name:"Rigoberta Menchú", aliases:["rigoberta menchu"], clues:[
+      "Activista indígena guatemalteca nacida en 1959, de origen maya quiché, criada en una familia campesina humilde.",
+      "Su familia sufrió directamente la violencia de la guerra civil guatemalteca, que dejó decenas de miles de víctimas indígenas.",
+      "Se convirtió en una destacada defensora internacional de los derechos de los pueblos indígenas de América.",
+      "Narró su testimonio personal sobre la represión sufrida por su comunidad en un libro de gran repercusión mundial.",
+      "Recibió el Premio Nobel de la Paz en 1992, año del quinto centenario de la llegada de Colón a América."
+    ]},
+    {name:"Malala Yousafzai", aliases:["malala yousafzai","malala"], clues:[
+      "Nacida en el valle del Swat, en Pakistán, en 1997, hija de un maestro que dirigía una escuela para niñas.",
+      "Comenzó a escribir de niña un blog anónimo denunciando la prohibición talibán de que las niñas estudiaran en su región.",
+      "Fue víctima de un ataque armado por parte de milicianos talibanes cuando viajaba en un autobús escolar.",
+      "Sobrevivió a un disparo en la cabeza y continuó desde entonces su activismo por la educación de las niñas a nivel mundial.",
+      "Es la persona más joven en recibir el Premio Nobel de la Paz, galardonada en 2014 con solo 17 años."
+    ]},
+    {name:"Wu Zetian", aliases:["wu zetian","emperatriz wu"], clues:[
+      "Nacida en China en el año 624, ingresó de joven como concubina en el palacio imperial de la dinastía Tang.",
+      "Ascendió gradualmente en la corte hasta convertirse en emperatriz consorte, ejerciendo un poder cada vez mayor tras el trono.",
+      "Eliminó sistemáticamente a sus rivales políticos, incluyendo a miembros de su propia familia, para consolidar su autoridad.",
+      "Depuso finalmente a su propio hijo y fundó una nueva dinastía imperial bajo su propio nombre.",
+      "Es la única mujer que gobernó China como emperatriz reinante por derecho propio en toda su historia."
+    ]},
+    {name:"Boudica", aliases:["boudica","boadicea"], clues:[
+      "Reina de un pueblo celta britano en el siglo I, esposa de un rey aliado del Imperio romano en la isla de Britania.",
+      "Tras la muerte de su marido, los romanos confiscaron su reino y humillaron públicamente a ella y a sus hijas.",
+      "Lideró una gran rebelión de varias tribus britanas contra la ocupación romana de la isla.",
+      "Sus fuerzas arrasaron varias ciudades romanas, incluida la actual Londres, antes de ser derrotadas.",
+      "Es un símbolo histórico de resistencia en Gran Bretaña, y una estatua suya se alza junto al Parlamento británico en Londres."
+    ]},
+    {name:"Atila", aliases:["atila","atila el huno"], clues:[
+      "Rey de un pueblo nómada de las estepas asiáticas, nacido a comienzos del siglo V, que llegó a gobernar junto a su hermano.",
+      "Unificó bajo su mando a numerosas tribus y pueblos nómadas en un vasto y temido imperio euroasiático.",
+      "Lanzó devastadoras invasiones contra los territorios del Imperio romano de Oriente y Occidente, exigiendo enormes tributos.",
+      "Fue detenido en su avance hacia las Galias en una gran batalla contra una coalición de romanos y visigodos.",
+      "Fue conocido por los romanos como 'el azote de Dios', temido gobernante de los hunos."
+    ]},
+    {name:"Kamehameha I", aliases:["kamehameha i","kamehameha"], clues:[
+      "Nacido en la isla de Hawái hacia 1758, perteneciente a la nobleza guerrera de uno de los reinos que dividían el archipiélago.",
+      "Comenzó a unificar bajo su mando las islas hawaianas mediante campañas militares y alianzas estratégicas.",
+      "Adoptó armas de fuego y consejeros europeos para reforzar su poder militar frente a otros jefes locales.",
+      "Completó la conquista de todas las islas principales del archipiélago hacia comienzos del siglo XIX.",
+      "Fundó el Reino de Hawái unificado, dinastía que gobernaría el archipiélago hasta finales de ese mismo siglo."
+    ]},
+    {name:"Menelik II", aliases:["menelik ii"], clues:[
+      "Emperador etíope nacido en 1844, que expandió y modernizó considerablemente su reino en el este de África.",
+      "Se enfrentó militarmente a las ambiciones coloniales de una potencia europea que buscaba anexionarse su país.",
+      "Lideró a sus tropas a una contundente victoria sobre el ejército italiano en la batalla de Adua, en 1896.",
+      "Aquella victoria convirtió a su país en el único territorio africano que logró frenar de forma decisiva la colonización europea.",
+      "Es recordado como el emperador que preservó la independencia de Etiopía frente al imperialismo italiano."
+    ]},
+    {name:"Pachacútec", aliases:["pachacutec","pachacuti"], clues:[
+      "Gobernante del reino cuzqueño en el siglo XV, que subió al poder tras repeler una invasión enemiga junto a su padre.",
+      "Reformó profundamente la organización política, religiosa y administrativa de su reino andino.",
+      "Emprendió una rápida expansión militar que transformó un pequeño reino regional en un vasto imperio.",
+      "Se le atribuye la construcción de varias de las más célebres edificaciones incas, entre ellas una ciudadela en lo alto de los Andes.",
+      "Es considerado el fundador del Imperio inca tal y como se conoció después, constructor de Machu Picchu."
+    ]},
+    {name:"Toussaint Louverture", aliases:["toussaint louverture"], clues:[
+      "Nacido esclavo en la colonia francesa de Saint-Domingue hacia 1743, aprendió a leer gracias a un padrino que lo instruyó.",
+      "Se unió a una gran rebelión de esclavos que estalló en la colonia tras conocerse los ideales de la Revolución francesa.",
+      "Se convirtió en el líder militar y político más destacado del movimiento independentista de la isla caribeña.",
+      "Derrotó a las fuerzas coloniales españolas, británicas y francesas, llegando a gobernar de facto la colonia entera.",
+      "Fue capturado por tropas enviadas por Napoleón y murió en prisión en Francia, poco antes de que Haití lograra su independencia."
+    ]},
+    {name:"Miguel Hidalgo", aliases:["miguel hidalgo","hidalgo"], clues:[
+      "Sacerdote mexicano nacido en 1753, párroco de un pequeño pueblo llamado Dolores, en el centro de México.",
+      "Se involucró en tertulias intelectuales donde se discutían las ideas ilustradas y los abusos del gobierno colonial.",
+      "Convocó a sus feligreses con un célebre repique de campanas para levantarse en armas contra el dominio español.",
+      "Aquel llamamiento, conocido como el 'Grito de Dolores', dio inicio a la guerra de independencia mexicana en 1810.",
+      "Fue capturado y fusilado al año siguiente, pero es honrado como el padre de la independencia de México."
+    ]},
+    {name:"Sitting Bull", aliases:["sitting bull","toro sentado"], clues:[
+      "Jefe y hombre sagrado del pueblo lakota, nacido hacia 1831 en las llanuras del norte de América.",
+      "Tuvo una visión en una ceremonia ritual que predijo una gran victoria sobre las tropas estadounidenses.",
+      "Lideró junto a otros jefes una coalición de tribus que se enfrentó a la caballería estadounidense a orillas de un río.",
+      "Aquella batalla terminó con la derrota total del regimiento comandado por el general George Custer.",
+      "Fue una de las figuras más destacadas de la resistencia indígena frente a la expansión estadounidense hacia el oeste."
+    ]},
+    {name:"Gerónimo", aliases:["geronimo"], clues:[
+      "Guerrero apache nacido hacia 1829 en el territorio fronterizo entre México y el actual suroeste de Estados Unidos.",
+      "Perdió a su madre, esposa e hijos en un ataque de soldados mexicanos, un hecho que marcó el resto de su vida.",
+      "Lideró durante años una resistencia armada contra las incursiones de tropas mexicanas y estadounidenses en su territorio.",
+      "Fue uno de los últimos líderes nativos americanos en rendirse formalmente al ejército de Estados Unidos, en 1886.",
+      "Pasó sus últimos años como prisionero de guerra, aunque llegó a participar en la comitiva de un desfile presidencial."
+    ]},
+    {name:"Empress Dowager Cixi", aliases:["cixi","emperatriz cixi","tzu hsi"], clues:[
+      "Nacida en 1835, ingresó de joven como concubina de rango medio en la corte imperial china de la dinastía Qing.",
+      "Ascendió en la jerarquía palaciega tras dar a luz al único hijo varón del emperador reinante.",
+      "Ejerció el poder real durante décadas desde detrás del trono, tras la muerte de su esposo y de su hijo.",
+      "Se opuso a numerosas reformas modernizadoras, contribuyendo al debilitamiento del imperio frente a las potencias extranjeras.",
+      "Gobernó China de facto durante casi medio siglo, hasta su muerte en 1908, poco antes de la caída de la dinastía Qing."
+    ]},
+    {name:"Meiji", aliases:["emperador meiji","meiji"], clues:[
+      "Emperador japonés nacido en 1852, que subió al trono en plena crisis del antiguo sistema feudal de su país.",
+      "Su reinado coincidió con el derrocamiento del último shogunato que había gobernado Japón durante siglos.",
+      "Impulsó una rápida y radical modernización de Japón siguiendo modelos industriales y militares occidentales.",
+      "Bajo su reinado, Japón pasó de un país aislado a convertirse en una potencia militar e industrial en pocas décadas.",
+      "Da nombre a la llamada 'era Meiji', el periodo de modernización que transformó por completo al Japón moderno."
+    ]},
+    {name:"Steve Jobs", aliases:["steve jobs"], clues:[
+      "Empresario estadounidense nacido en San Francisco en 1955, dado en adopción al nacer por sus padres biológicos.",
+      "Fundó junto a un amigo de instituto una empresa de tecnología en el garaje de su familia a finales de los años setenta.",
+      "Fue destituido de la dirección de su propia empresa en los años ochenta tras conflictos internos con la junta directiva.",
+      "Regresó a la compañía años después, liderando una nueva etapa de éxito con productos revolucionarios de diseño minimalista.",
+      "Cofundó Apple y presentó personalmente el iPhone en 2007, transformando la industria de la telefonía móvil."
+    ]},
+    {name:"Julio Verne", aliases:["julio verne","jules verne"], clues:[
+      "Escritor francés nacido en Nantes en 1828, hijo de un abogado que esperaba que siguiera su misma profesión.",
+      "Abandonó el derecho para dedicarse a la literatura, fascinado desde joven por los viajes y la ciencia.",
+      "Escribió sobre un capitán misterioso que navegaba los océanos a bordo de un submarino llamado Nautilus.",
+      "Imaginó viajes al centro de la Tierra, a la Luna y alrededor del mundo en apenas ochenta días, décadas antes de que fueran técnicamente posibles.",
+      "Es considerado uno de los padres de la ciencia ficción moderna, autor de 'Veinte mil leguas de viaje submarino'."
+    ]},
+    {name:"Aung San Suu Kyi", aliases:["aung san suu kyi"], clues:[
+      "Nacida en Rangún, Birmania, en 1945, hija de un líder independentista asesinado cuando ella era apenas una niña.",
+      "Regresó a su país tras vivir años en el extranjero para cuidar de su madre enferma, justo cuando estallaban protestas contra la dictadura militar.",
+      "Fundó un partido político opositor y pasó casi quince años bajo arresto domiciliario por su activismo pacífico.",
+      "Recibió el Premio Nobel de la Paz mientras seguía confinada en su propia casa, sin poder recogerlo en persona.",
+      "Se convirtió en líder de facto de Birmania tras las primeras elecciones libres, aunque su prestigio internacional se derrumbó por su silencio ante la represión de una minoría musulmana."
+    ]},
+    {name:"Muhammad Ali", aliases:["muhammad ali","cassius clay"], clues:[
+      "Boxeador estadounidense nacido en Kentucky en 1942 con el nombre de Cassius Clay, ganador de una medalla de oro olímpica siendo adolescente.",
+      "Se convirtió al islam y cambió su nombre poco después de proclamarse campeón mundial de los pesos pesados.",
+      "Se negó a ser reclutado para la guerra de Vietnam por motivos religiosos, lo que le costó su título y años de carrera.",
+      "Recuperó el título mundial en un célebre combate en Kinshasa, Zaire, contra un rival mucho más joven y favorito.",
+      "Es considerado uno de los mayores boxeadores de la historia, célebre por su frase 'vuela como una mariposa, pica como una abeja'."
+    ]},
+    {name:"Pelé", aliases:["pele","edson arantes do nascimento"], clues:[
+      "Futbolista brasileño nacido en 1940 en un pueblo del interior de Brasil, hijo de un futbolista de segunda división.",
+      "Debutó como profesional siendo apenas un adolescente en un club de la ciudad de Santos.",
+      "Se convirtió, con solo diecisiete años, en el jugador más joven en marcar en una final de un Mundial.",
+      "Ganó tres campeonatos del mundo con la selección brasileña, un récord que ningún otro jugador ha igualado.",
+      "Es considerado por muchos el mejor futbolista de la historia, autor de más de mil goles a lo largo de su carrera."
+    ]},
+    {name:"Diana de Gales", aliases:["diana de gales","lady di","diana spencer"], clues:[
+      "Nacida en 1961 en el seno de la aristocracia británica, se casó a los veinte años con el heredero al trono del Reino Unido.",
+      "Se convirtió en una de las figuras más fotografiadas del mundo, admirada por su cercanía con el público.",
+      "Se implicó personalmente en causas humanitarias, incluyendo la lucha contra el estigma del sida y las minas antipersona.",
+      "Su matrimonio terminó en un sonado divorcio tras años de rumores sobre infidelidades en ambas partes.",
+      "Murió en un accidente de tráfico en un túnel de París en 1997, perseguida por fotógrafos, conocida como 'la princesa del pueblo'."
+    ]},
+    {name:"Mijaíl Gorbachov", aliases:["mijail gorbachov","gorbachov"], clues:[
+      "Político soviético nacido en 1931 en una familia campesina del sur de Rusia, que ascendió gradualmente en el Partido Comunista.",
+      "Se convirtió en el líder más joven de la Unión Soviética en décadas al asumir el poder en 1985.",
+      "Impulsó dos políticas de apertura y reforma conocidas por sus términos rusos de transparencia y reestructuración.",
+      "Sus reformas aceleraron la caída de los regímenes comunistas en Europa del Este y el fin de la Guerra Fría.",
+      "Fue el último líder de la Unión Soviética, que se disolvió oficialmente en 1991 tras su renuncia."
+    ]},
+    {name:"Ronald Reagan", aliases:["ronald reagan","reagan"], clues:[
+      "Actor de Hollywood nacido en Illinois en 1911, que dio el salto a la política tras años de carrera cinematográfica.",
+      "Fue gobernador de California antes de convertirse en presidente de Estados Unidos en 1981.",
+      "Impulsó una política económica de fuertes recortes fiscales que llevaría después su propio nombre.",
+      "Pronunció un famoso discurso ante el Muro de Berlín pidiendo a su homólogo soviético que lo derribara.",
+      "Sobrevivió a un intento de asesinato pocos meses después de asumir la presidencia estadounidense."
+    ]},
+    {name:"Margaret Thatcher", aliases:["margaret thatcher","thatcher"], clues:[
+      "Política británica nacida en 1925, hija de un tendero, que estudió química antes de dedicarse a la política.",
+      "Se convirtió en líder del Partido Conservador y, en 1979, en la primera mujer en dirigir el gobierno británico.",
+      "Impulsó drásticas políticas de privatización y liberalización económica que transformaron la economía británica.",
+      "Lideró al Reino Unido durante el conflicto bélico de las Malvinas contra Argentina en 1982.",
+      "Es conocida como 'la dama de hierro' por su inflexible estilo de liderazgo político."
+    ]},
+    {name:"John F. Kennedy", aliases:["john f kennedy","jfk","john kennedy"], clues:[
+      "Político estadounidense nacido en Massachusetts en 1917, héroe de guerra tras el hundimiento de su lancha torpedera en el Pacífico.",
+      "Se convirtió en 1961 en el presidente más joven elegido en la historia de Estados Unidos.",
+      "Gestionó una grave crisis con la Unión Soviética por el despliegue de misiles nucleares en Cuba.",
+      "Impulsó el ambicioso programa espacial que llevaría al ser humano a la Luna antes del final de la década.",
+      "Fue asesinado a tiros en Dallas en 1963 mientras circulaba en una comitiva oficial abierta."
+    ]},
+    {name:"Marco Antonio", aliases:["marco antonio","marcus antonius"], clues:[
+      "General y político romano nacido hacia el 83 a.C., leal colaborador militar de Julio César durante años.",
+      "Pronunció un célebre discurso fúnebre tras el asesinato de César que enfureció al pueblo romano contra los conspiradores.",
+      "Formó un triunvirato con Octavio y otro general para repartirse el control del mundo romano.",
+      "Mantuvo una intensa relación política y sentimental con la reina egipcia Cleopatra.",
+      "Fue derrotado por Octavio en la batalla naval de Actium y se quitó la vida poco después en Egipto."
+    ]},
+    {name:"Zenobia", aliases:["zenobia"], clues:[
+      "Reina de un poderoso reino en Oriente Próximo en el siglo III, que se autoproclamó descendiente de la mismísima Cleopatra.",
+      "Asumió el poder tras el asesinato de su esposo, gobernando en nombre de su joven hijo.",
+      "Aprovechó la debilidad temporal de Roma para expandir su reino, llegando a conquistar Egipto y parte de Asia Menor.",
+      "Se rebeló abiertamente contra la autoridad romana, proclamándose emperatriz independiente.",
+      "Fue finalmente derrotada y capturada por el emperador romano Aureliano, reina de Palmira, en la actual Siria."
+    ]},
+    {name:"Justiniano I", aliases:["justiniano i","justiniano"], clues:[
+      "Emperador bizantino nacido hacia el año 482 en una familia campesina de los Balcanes, de origen humilde.",
+      "Se casó con una antigua actriz de circo llamada Teodora, que se convertiría en su influyente emperatriz consorte.",
+      "Ordenó recopilar y sistematizar todo el derecho romano en un extenso código legal que aún influye en muchas legislaciones.",
+      "Reconquistó temporalmente amplios territorios del antiguo Imperio romano de Occidente, incluyendo Italia y el norte de África.",
+      "Mandó construir la basílica de Santa Sofía en Constantinopla, una de las obras arquitectónicas más impresionantes de su época."
+    ]},
+    {name:"Carlomagno", aliases:["carlomagno","carlos magno"], clues:[
+      "Rey de los francos nacido hacia el año 742, que heredó el trono junto a su hermano y lo gobernó él solo tras su muerte.",
+      "Emprendió campañas militares constantes que expandieron su reino por gran parte de Europa occidental.",
+      "Impulsó un renacimiento cultural en su corte, promoviendo la copia de manuscritos y la educación del clero.",
+      "Fue coronado por el Papa en Roma en la Nochebuena del año 800 con un nuevo y prestigioso título imperial.",
+      "Se convirtió en el primer emperador de Occidente desde la caída de Roma, considerado el padre de Europa."
+    ]},
+    {name:"Guillermo el Conquistador", aliases:["guillermo el conquistador","guillermo i de inglaterra"], clues:[
+      "Duque de Normandía nacido hacia 1028, hijo ilegítimo de un noble francés, lo que le valió el apodo de 'el Bastardo' en su juventud.",
+      "Reclamó el trono de Inglaterra alegando una promesa de sucesión que, según él, le había hecho el rey inglés.",
+      "Cruzó el canal de la Mancha con un ejército para hacer valer su reclamación por la fuerza en 1066.",
+      "Derrotó y mató al rey anglosajón Haroldo II en la célebre batalla de Hastings.",
+      "Se convirtió en rey de Inglaterra, transformando profundamente la sociedad, la lengua y la nobleza inglesas."
+    ]},
+    {name:"Ricardo Corazón de León", aliases:["ricardo corazon de leon","ricardo i de inglaterra"], clues:[
+      "Rey inglés nacido en 1157, que pasó la mayor parte de su reinado fuera de Inglaterra, en campañas militares.",
+      "Lideró un gran ejército europeo en una cruzada hacia Tierra Santa para recuperar Jerusalén.",
+      "Se enfrentó repetidamente al sultán Saladino, con quien finalmente pactó una tregua sin recuperar la ciudad santa.",
+      "Fue capturado y retenido como rehén por un duque austríaco en su viaje de regreso, exigiendo un enorme rescate por su libertad.",
+      "Es célebre por su valentía en el combate, que le valió el sobrenombre de 'Corazón de León'."
+    ]},
+    {name:"Saladino", aliases:["saladino","salah al din"], clues:[
+      "Militar kurdo nacido en Tikrit, en el actual Irak, hacia 1137, que sirvió a las órdenes de un sultán sirio antes de forjar su propio poder.",
+      "Unificó bajo su mando Egipto y Siria, poniendo fin a un antiguo califato chiita en El Cairo.",
+      "Derrotó a los ejércitos cruzados en la decisiva batalla de los Cuernos de Hattin en 1187.",
+      "Reconquistó Jerusalén para el islam tras casi un siglo de dominio cristiano en la ciudad.",
+      "Se enfrentó con respeto mutuo a Ricardo Corazón de León durante la Tercera Cruzada, fundador de la dinastía ayubí."
+    ]},
+    {name:"Erasmo de Rotterdam", aliases:["erasmo de rotterdam","erasmo"], clues:[
+      "Sacerdote y humanista neerlandés nacido hacia 1466, considerado una de las mentes más brillantes de su época.",
+      "Viajó por toda Europa relacionándose con reyes, papas e intelectuales, sin llegar a establecerse permanentemente en ningún lugar.",
+      "Publicó una nueva edición crítica del Nuevo Testamento en griego que influyó en toda la Reforma protestante.",
+      "Escribió una célebre sátira sobre la necedad humana dedicada a un amigo cuyo apellido significaba precisamente 'necio'.",
+      "Es autor de 'Elogio de la locura' y uno de los grandes referentes del humanismo renacentista europeo."
+    ]},
+    {name:"Johannes Gutenberg", aliases:["johannes gutenberg","gutenberg"], clues:[
+      "Orfebre y herrero alemán nacido en Maguncia hacia 1400, formado en el trabajo de metales preciosos.",
+      "Desarrolló un sistema de tipos móviles metálicos reutilizables para imprimir textos de forma mecánica.",
+      "Combinó esa técnica con una prensa adaptada de los lagares de vino y aceite para crear un nuevo método de impresión.",
+      "Imprimió una edición de la Biblia que se convirtió en el primer gran libro producido en serie de la historia occidental.",
+      "Su invento de la imprenta revolucionó la difusión del conocimiento en toda Europa."
+    ]},
+    {name:"Sun Tzu", aliases:["sun tzu","sunzi"], clues:[
+      "Estratega militar chino que se cree vivió hacia el siglo V a.C., aunque su existencia histórica exacta sigue debatida.",
+      "Sirvió, según la tradición, como general al servicio de un rey del periodo de los Reinos Combatientes.",
+      "Escribió un breve tratado sobre estrategia militar organizado en trece capítulos temáticos.",
+      "Su obra insiste en el engaño, la información y evitar el combate directo siempre que sea posible.",
+      "Es autor de 'El arte de la guerra', el tratado militar más influyente y leído de toda la historia."
+    ]},
+    {name:"Qin Shi Huang", aliases:["qin shi huang","primer emperador de china"], clues:[
+      "Rey de un estado chino nacido en 259 a.C., que heredó el trono siendo apenas un niño de trece años.",
+      "Conquistó por la fuerza a los demás reinos rivales, unificando por primera vez toda China bajo un único gobierno.",
+      "Estandarizó la escritura, la moneda y las medidas en todo su nuevo imperio para reforzar su control.",
+      "Ordenó unir y ampliar antiguas murallas fronterizas para defenderse de los pueblos nómadas del norte.",
+      "Fue enterrado junto a un ejército de miles de guerreros de terracota, descubierto por accidente en 1974."
+    ]},
+    {name:"Zheng He", aliases:["zheng he"], clues:[
+      "Almirante chino nacido en 1371, de origen musulmán, que de niño fue capturado y castrado tras una conquista militar.",
+      "Se convirtió en un influyente eunuco de la corte imperial durante la dinastía Ming.",
+      "Comandó siete grandes expediciones marítimas con enormes flotas que llegaron hasta la costa oriental de África.",
+      "Sus barcos eran varias veces más grandes que las carabelas europeas que navegarían décadas después.",
+      "Sus viajes precedieron en décadas a los grandes descubrimientos europeos, aunque China abandonó después esa expansión naval."
+    ]},
+    {name:"Ibn Battuta", aliases:["ibn battuta"], clues:[
+      "Viajero y estudioso musulmán nacido en Tánger, en el actual Marruecos, en 1304.",
+      "Partió de joven en peregrinación a La Meca y acabó extendiendo su viaje durante casi tres décadas.",
+      "Recorrió gran parte de África, Oriente Próximo, Asia Central, India y el sudeste asiático.",
+      "Sirvió como juez en varias cortes musulmanas durante sus largos años de viaje por el mundo islámico.",
+      "Dictó al regresar un extenso relato de sus viajes, una de las mayores crónicas de exploración de la Edad Media."
+    ]},
+    {name:"Avicena", aliases:["avicena","ibn sina"], clues:[
+      "Médico y filósofo nacido cerca de Bujará, en la actual Uzbekistán, en 980, que ya dominaba el Corán de memoria siendo niño.",
+      "Trabajó como médico en varias cortes de Asia Central, llegando a curar a algunos gobernantes de enfermedades graves.",
+      "Escribió una extensa enciclopedia médica que sistematizaba todo el conocimiento médico conocido hasta entonces.",
+      "Esa obra se convirtió en un manual de referencia obligatorio en las universidades europeas durante siglos.",
+      "Es autor de 'El canon de medicina', uno de los científicos y filósofos más influyentes del mundo islámico medieval."
+    ]},
+    {name:"Hammurabi", aliases:["hammurabi"], clues:[
+      "Rey de la ciudad de Babilonia que subió al trono hacia el 1792 a.C., en la antigua Mesopotamia.",
+      "Expandió su pequeño reino mediante conquistas y alianzas hasta unificar gran parte de la región bajo su mando.",
+      "Ordenó grabar un extenso conjunto de leyes en una gran estela de piedra para todo su reino.",
+      "Ese código establecía castigos proporcionales según el célebre principio de 'ojo por ojo, diente por diente'.",
+      "Es autor de uno de los primeros códigos legales escritos de la historia, hallado en Persépolis en 1901."
+    ]},
+    {name:"Nabucodonosor II", aliases:["nabucodonosor ii","nabucodonosor"], clues:[
+      "Rey de Babilonia que subió al trono en el 605 a.C., heredero de un imperio en plena expansión en Mesopotamia.",
+      "Conquistó el reino de Judá y destruyó el Templo de Jerusalén, deportando a buena parte de su población a Babilonia.",
+      "Aquel episodio dio origen al conocido como 'cautiverio babilónico' del pueblo judío.",
+      "Se le atribuye la construcción de unos legendarios jardines colgantes considerados una de las maravillas del mundo antiguo.",
+      "Convirtió Babilonia en la ciudad más grande y espléndida de su tiempo durante su largo reinado."
+    ]},
+    {name:"Solón", aliases:["solon"], clues:[
+      "Político y poeta ateniense nacido hacia el 638 a.C., en una época de fuertes tensiones entre ricos y pobres en su ciudad.",
+      "Fue nombrado árbitro con poderes especiales para reformar las leyes de Atenas y evitar una guerra civil.",
+      "Canceló las deudas que habían convertido a muchos ciudadanos pobres en esclavos por impago.",
+      "Reorganizó la participación política según la riqueza en lugar de únicamente por linaje familiar.",
+      "Sus reformas sentaron las bases sobre las que después se construiría la democracia ateniense."
+    ]},
+    {name:"Séneca", aliases:["seneca","lucio anneo seneca"], clues:[
+      "Filósofo y escritor nacido en Córdoba hacia el año 4 a.C., trasladado de niño a Roma para su educación.",
+      "Fue desterrado a la isla de Córcega durante años acusado de un adulterio con una princesa imperial.",
+      "Fue llamado de vuelta a Roma para convertirse en tutor de un joven que llegaría a ser emperador.",
+      "Ejerció gran influencia política durante los primeros años de gobierno de ese antiguo alumno suyo, Nerón.",
+      "Fue obligado por Nerón a suicidarse tras ser acusado de participar en una conspiración contra él, referente de la filosofía estoica."
+    ]},
+    {name:"Cicerón", aliases:["ciceron","marco tulio ciceron"], clues:[
+      "Orador y político romano nacido en el 106 a.C. en una familia no perteneciente a la antigua nobleza patricia.",
+      "Se convirtió en uno de los abogados y oradores más admirados de toda la historia de Roma.",
+      "Denunció públicamente una conspiración para derrocar a la República durante su año como cónsul.",
+      "Se opuso duramente a Marco Antonio tras la muerte de Julio César, pronunciando una serie de feroces discursos contra él.",
+      "Fue asesinado por orden de Marco Antonio en represalia por aquellos discursos, considerado el mayor orador de Roma."
+    ]},
+    {name:"Trajano", aliases:["trajano"], clues:[
+      "Emperador romano nacido en Hispania en el año 53, el primero en nacer fuera de Italia en llegar al trono.",
+      "Fue adoptado como heredero por el emperador Nerva ante la falta de un hijo propio de este último.",
+      "Llevó al Imperio romano a su máxima extensión territorial de toda su historia mediante conquistas en Dacia y Oriente.",
+      "Impulsó grandes obras públicas en Roma, entre ellas un mercado y una columna conmemorativa que aún se conserva.",
+      "Es considerado uno de los llamados 'cinco buenos emperadores', modelo de buen gobierno para emperadores posteriores."
+    ]},
+    {name:"Constantino I", aliases:["constantino i","constantino el grande"], clues:[
+      "Emperador romano nacido hacia el año 272, hijo de un oficial militar que llegaría también a ser emperador.",
+      "Se proclamó emperador tras la muerte de su padre en Britania, iniciando años de luchas contra otros rivales al trono.",
+      "Aseguró haber visto una señal divina en el cielo antes de una batalla decisiva junto al río Tíber.",
+      "Legalizó el cristianismo en todo el Imperio romano tras siglos de persecuciones intermitentes.",
+      "Fundó una nueva capital imperial en el Bósforo que llevaría su propio nombre, Constantinopla."
+    ]},
+    {name:"Hipatia de Alejandría", aliases:["hipatia de alejandria","hipatia"], clues:[
+      "Filósofa y matemática nacida en Alejandría, Egipto, hacia el año 355, hija de un reconocido astrónomo y matemático.",
+      "Dirigió una influyente escuela filosófica en su ciudad, enseñando tanto a paganos como a cristianos.",
+      "Se convirtió en una respetada consejera de asuntos políticos y científicos para las autoridades de la ciudad.",
+      "Fue víctima de las crecientes tensiones religiosas y políticas entre distintos grupos de la Alejandría tardorromana.",
+      "Fue asesinada brutalmente por una turba en el año 415, convertida en símbolo del conocimiento científico de la Antigüedad."
+    ]},
+    {name:"León Trotski", aliases:["leon trotski","trotski","leon trotsky"], clues:[
+      "Revolucionario ruso nacido en Ucrania en 1879, que participó activamente en el movimiento marxista desde muy joven.",
+      "Organizó y dirigió el Ejército Rojo durante la guerra civil que siguió a la revolución bolchevique.",
+      "Fue uno de los principales líderes de la revolución de 1917 junto a Lenin, aunque después se convirtió en rival de Stalin.",
+      "Fue expulsado del Partido Comunista y desterrado de la Unión Soviética tras perder la lucha por el poder.",
+      "Se exilió en México, donde fue asesinado en 1940 de un golpe de piolet por un agente enviado por Stalin."
+    ]},
+    {name:"Rasputín", aliases:["rasputin","grigori rasputin"], clues:[
+      "Campesino místico ruso nacido en Siberia hacia 1869, que ganó fama de curandero y hombre santo itinerante.",
+      "Se ganó la confianza de la familia imperial rusa al parecer capaz de aliviar la hemofilia del joven heredero al trono.",
+      "Adquirió una enorme influencia política y personal sobre la zarina Alejandra durante la Primera Guerra Mundial.",
+      "Su comportamiento escandaloso y su influencia generaron un gran rechazo entre la aristocracia y el pueblo ruso.",
+      "Fue asesinado por un grupo de nobles en 1916, en vísperas de la revolución que acabaría con la dinastía Románov."
+    ]},
+    {name:"Nicolás II de Rusia", aliases:["nicolas ii de rusia","nicolas ii","zar nicolas ii"], clues:[
+      "Último zar de Rusia, nacido en 1868, que subió al trono de forma imprevista tras la muerte repentina de su padre.",
+      "Su gobierno autocrático se enfrentó a crecientes protestas y una revolución fallida en 1905.",
+      "Condujo a Rusia a la Primera Guerra Mundial, un conflicto que agravó enormemente el descontento popular.",
+      "Fue obligado a abdicar durante la revolución de febrero de 1917, poniendo fin a siglos de dinastía Románov.",
+      "Fue ejecutado junto a toda su familia por los bolcheviques en 1918, en el sótano de una casa en Ekaterimburgo."
+    ]},
+    {name:"Sun Yat-sen", aliases:["sun yat sen"], clues:[
+      "Médico y revolucionario chino nacido en 1866 en una familia campesina del sur de China.",
+      "Estudió medicina en Hong Kong antes de dedicarse por completo a organizar movimientos contra la dinastía imperial Qing.",
+      "Lideró varios levantamientos fallidos desde el exilio antes de que finalmente triunfara una revolución en 1911.",
+      "Se convirtió en el primer presidente provisional de la nueva república tras la caída de la dinastía imperial.",
+      "Es considerado el padre de la China moderna, fundador del partido nacionalista chino Kuomintang."
+    ]},
+    {name:"Chiang Kai-shek", aliases:["chiang kai shek"], clues:[
+      "Militar chino nacido en 1887, que se formó parcialmente en academias militares japonesas antes de regresar a China.",
+      "Sucedió a Sun Yat-sen como líder del partido nacionalista chino tras la muerte de este.",
+      "Libró una larga guerra civil contra las fuerzas comunistas lideradas por Mao Zedong.",
+      "Combatió también contra la invasión japonesa de China durante la Segunda Guerra Mundial.",
+      "Perdió finalmente la guerra civil frente a Mao y se refugió con su gobierno en la isla de Taiwán en 1949."
+    ]},
+    {name:"Deng Xiaoping", aliases:["deng xiaoping"], clues:[
+      "Político chino nacido en 1904, que estudió y trabajó de joven en Francia junto a otros futuros revolucionarios chinos.",
+      "Sobrevivió a varias purgas políticas internas dentro del Partido Comunista Chino a lo largo de su carrera.",
+      "Se convirtió en el líder de facto de China tras la muerte de Mao Zedong, sin ocupar nunca el cargo de máximo dirigente formal.",
+      "Impulsó profundas reformas económicas de mercado que transformaron radicalmente la economía china.",
+      "Es considerado el arquitecto de la apertura económica china moderna, bajo el lema de 'un país, dos sistemas'."
+    ]},
+    {name:"Kim Il-sung", aliases:["kim il sung"], clues:[
+      "Nacido en Corea en 1912, luchó como guerrillero comunista contra la ocupación japonesa de su país.",
+      "Fue instalado como líder de la mitad norte de la península coreana con el respaldo de la Unión Soviética tras la Segunda Guerra Mundial.",
+      "Invadió Corea del Sur en 1950, desencadenando una devastadora guerra que terminó en un armisticio sin tratado de paz.",
+      "Desarrolló un culto a la personalidad extremo y una ideología de autosuficiencia nacional propia de su país.",
+      "Fundó la dinastía política que sigue gobernando Corea del Norte hasta la actualidad."
+    ]},
+    {name:"Benito Juárez", aliases:["benito juarez"], clues:[
+      "Nacido en un pueblo indígena zapoteco de Oaxaca, México, en 1806, quedó huérfano siendo niño.",
+      "Estudió derecho pese a las enormes dificultades de su origen humilde, llegando a ser gobernador de su estado.",
+      "Impulsó reformas liberales que separaban a la Iglesia católica del poder político y económico en México.",
+      "Resistió al frente de un gobierno itinerante durante la invasión francesa que instauró un emperador extranjero en México.",
+      "Se convirtió en el primer presidente indígena de México, símbolo de la resistencia frente al Segundo Imperio mexicano."
+    ]},
+    {name:"Guglielmo Marconi", aliases:["guglielmo marconi","marconi"], clues:[
+      "Ingeniero italiano nacido en Bolonia en 1874, que experimentó desde joven con las recientes ondas electromagnéticas.",
+      "Desarrolló un sistema práctico de comunicación que no necesitaba cables físicos entre emisor y receptor.",
+      "Logró enviar la primera señal transatlántica sin hilos entre Europa y América del Norte en 1901.",
+      "Su invento revolucionó las comunicaciones marítimas, salvando vidas en desastres como el hundimiento del Titanic.",
+      "Recibió el Premio Nobel de Física por sus contribuciones al desarrollo de la telegrafía sin hilos, la radio."
+    ]},
+    {name:"Henry Ford", aliases:["henry ford"], clues:[
+      "Empresario estadounidense nacido en Michigan en 1863, hijo de granjeros, fascinado desde niño por la mecánica.",
+      "Fundó una compañía automovilística tras varios intentos previos fallidos en la incipiente industria del motor.",
+      "Introdujo la línea de montaje móvil, reduciendo drásticamente el tiempo y el coste de fabricar un automóvil.",
+      "Duplicó el salario mínimo de sus trabajadores para que pudieran permitirse comprar los coches que fabricaban.",
+      "Es el fundador de la Ford Motor Company y creador del modelo T, que popularizó el automóvil de masas."
+    ]},
+    {name:"Walt Disney", aliases:["walt disney"], clues:[
+      "Animador y empresario estadounidense nacido en Chicago en 1901, que comenzó su carrera dibujando anuncios comerciales.",
+      "Creó un ratón animado como personaje principal de sus primeros cortos con sonido sincronizado.",
+      "Produjo el primer largometraje de animación de la historia del cine sonoro, basado en un cuento de los hermanos Grimm.",
+      "Fundó un parque temático en California que revolucionó el concepto del entretenimiento familiar.",
+      "Es el creador de Mickey Mouse y fundador de uno de los mayores estudios de animación y entretenimiento del mundo."
+    ]},
+    {name:"Coco Chanel", aliases:["coco chanel","gabrielle chanel"], clues:[
+      "Diseñadora francesa nacida en 1883, criada en un orfanato tras quedar huérfana de madre siendo niña.",
+      "Comenzó su carrera diseñando sombreros antes de fundar su propia casa de moda en París.",
+      "Revolucionó la moda femenina liberando a las mujeres de los corsés rígidos con prendas más cómodas y sencillas.",
+      "Lanzó un célebre perfume identificado únicamente con un número, que se convirtió en un icono mundial.",
+      "Es la creadora del icónico traje de chaqueta y del perfume Chanel Nº5, una de las diseñadoras más influyentes del siglo XX."
+    ]},
+    {name:"Rosa Luxemburgo", aliases:["rosa luxemburgo"], clues:[
+      "Filósofa y revolucionaria nacida en Polonia en 1871, de origen judío, que emigró a Alemania para estudiar y hacer política.",
+      "Se convirtió en una destacada teórica marxista, crítica tanto del capitalismo como de ciertas posturas del propio movimiento socialista.",
+      "Cofundó un movimiento revolucionario alemán tras el fin de la Primera Guerra Mundial.",
+      "Participó en un levantamiento fallido en Berlín contra el nuevo gobierno republicano alemán.",
+      "Fue capturada y asesinada por milicias paramilitares en 1919, convertida en símbolo del socialismo revolucionario europeo."
+    ]},
+    {name:"Theodor Herzl", aliases:["theodor herzl","herzl"], clues:[
+      "Periodista austrohúngaro de origen judío nacido en Budapest en 1860, formado como abogado en Viena.",
+      "Cubrió como corresponsal un escándalo judicial en Francia marcado por un fuerte antisemitismo público.",
+      "Aquel episodio le convenció de que los judíos europeos necesitaban un Estado propio para estar a salvo.",
+      "Organizó el primer congreso internacional dedicado a promover ese proyecto nacional en Suiza en 1897.",
+      "Es considerado el padre del sionismo político moderno, movimiento que impulsó la creación del Estado de Israel."
+    ]},
+    {name:"David Ben-Gurión", aliases:["david ben gurion"], clues:[
+      "Nacido en Polonia en 1886, emigró de joven a Palestina como parte del movimiento sionista de colonización agrícola.",
+      "Se convirtió en el líder más destacado de la comunidad judía en Palestina durante el mandato británico.",
+      "Leyó públicamente la declaración de independencia de un nuevo Estado en Tel Aviv en 1948.",
+      "Dirigió a ese nuevo país durante la guerra que estalló inmediatamente tras su fundación contra sus vecinos árabes.",
+      "Es el fundador y primer primer ministro del Estado de Israel."
+    ]},
+    {name:"Yasir Arafat", aliases:["yasir arafat","yaser arafat"], clues:[
+      "Nacido en 1929, se convirtió en la figura más destacada del movimiento nacionalista palestino desde los años sesenta.",
+      "Lideró una organización que combinó la lucha armada con la actividad política y diplomática durante décadas.",
+      "Sobrevivió a numerosos atentados e intentos de asesinato a lo largo de su larga carrera política.",
+      "Firmó unos históricos acuerdos de paz con Israel en la Casa Blanca en 1993, compartiendo después el Nobel de la Paz.",
+      "Se convirtió en el primer presidente de la Autoridad Nacional Palestina hasta su muerte en 2004."
+    ]},
+    {name:"Konrad Adenauer", aliases:["konrad adenauer"], clues:[
+      "Político alemán nacido en Colonia en 1876, alcalde de su ciudad natal hasta que los nazis lo destituyeron por su oposición al régimen.",
+      "Fue arrestado en dos ocasiones durante la época nazi por su pasado como político democrático.",
+      "Se convirtió en el primer canciller de la nueva República Federal de Alemania tras la Segunda Guerra Mundial.",
+      "Lideró la reconstrucción económica y la reintegración internacional de Alemania Occidental durante los años cincuenta.",
+      "Es considerado uno de los padres fundadores de la actual Unión Europea junto a otros líderes europeos de posguerra."
+    ]},
+    {name:"Gregor Mendel", aliases:["gregor mendel","mendel"], clues:[
+      "Monje agustino nacido en Moravia, en el Imperio austrohúngaro, en 1822, formado también en ciencias naturales.",
+      "Cultivó durante años miles de plantas de guisantes en el jardín de su monasterio, cruzándolas sistemáticamente.",
+      "Observó patrones matemáticos regulares en cómo se transmitían ciertos rasgos de una generación a otra.",
+      "Sus resultados fueron ignorados por la comunidad científica de su época y solo se redescubrieron décadas después de su muerte.",
+      "Es considerado el padre de la genética moderna gracias a sus experimentos con guisantes."
+    ]},
+    {name:"Max Planck", aliases:["max planck"], clues:[
+      "Físico alemán nacido en Kiel en 1858, dedicado inicialmente al estudio de la radiación del calor de los cuerpos.",
+      "Propuso que la energía no se emitía de forma continua, sino en pequeñas unidades discretas.",
+      "Introdujo una constante fundamental que hoy lleva su nombre en la física teórica.",
+      "Sus ideas, inicialmente consideradas un simple recurso matemático, sentaron sin querer las bases de una nueva rama de la física.",
+      "Es considerado el padre de la física cuántica y recibió el Premio Nobel de Física en 1918."
+    ]},
+    {name:"Werner Heisenberg", aliases:["werner heisenberg","heisenberg"], clues:[
+      "Físico alemán nacido en Wurzburgo en 1901, uno de los jóvenes talentos que desarrollaron la física cuántica en los años veinte.",
+      "Formuló un célebre principio según el cual no se puede conocer con total precisión a la vez la posición y la velocidad de una partícula.",
+      "Ese principio de incertidumbre transformó profundamente la comprensión científica del mundo subatómico.",
+      "Dirigió el programa de investigación nuclear alemán durante la Segunda Guerra Mundial, que nunca llegó a desarrollar una bomba atómica.",
+      "Recibió el Premio Nobel de Física por la creación de la mecánica cuántica, célebre por su principio de incertidumbre."
+    ]},
+    {name:"J. Robert Oppenheimer", aliases:["robert oppenheimer","j robert oppenheimer","oppenheimer"], clues:[
+      "Físico teórico estadounidense nacido en Nueva York en 1904, formado en las mejores universidades de Europa y Estados Unidos.",
+      "Fue elegido para dirigir un laboratorio secreto en el desierto de Nuevo México durante la Segunda Guerra Mundial.",
+      "Lideró al equipo científico encargado de desarrollar la primera bomba atómica del mundo.",
+      "Tras presenciar la primera prueba nuclear, citó un verso de un texto hindú sobre convertirse en la muerte, destructor de mundos.",
+      "Vio después revocada su acreditación de seguridad por sus vínculos pasados con el comunismo, arrepentido de su papel en la creación del arma nuclear."
+    ]},
+    {name:"Louis Armstrong", aliases:["louis armstrong"], clues:[
+      "Trompetista y cantante estadounidense nacido en Nueva Orleans en 1901, criado en la pobreza extrema.",
+      "Aprendió a tocar la trompeta en un reformatorio juvenil al que fue enviado tras disparar un arma al aire en año nuevo.",
+      "Se convirtió en una figura central en la popularización del jazz como género musical de fama internacional.",
+      "Era reconocible por su voz rasposa y particular, con la que popularizó canciones como 'What a Wonderful World'.",
+      "Es conocido como 'Satchmo', uno de los músicos más influyentes en la historia del jazz."
+    ]},
+    {name:"W.E.B. Du Bois", aliases:["web du bois","w e b du bois","du bois"], clues:[
+      "Sociólogo y activista afroamericano nacido en Massachusetts en 1868, el primer afroamericano en doctorarse en Harvard.",
+      "Estudió y denunció con rigor académico las condiciones de vida de la población negra en Estados Unidos.",
+      "Cofundó una de las organizaciones más importantes por los derechos civiles de los afroamericanos en el siglo XX.",
+      "Defendió posturas más combativas frente a otros líderes negros de su época, partidarios de un progreso más gradual.",
+      "Terminó sus últimos años de vida en Ghana, tras renunciar a su ciudadanía estadounidense por desilusión con el racismo persistente."
+    ]},
+    {name:"Marcus Garvey", aliases:["marcus garvey"], clues:[
+      "Nacido en Jamaica en 1887, emigró de joven a Estados Unidos, donde fundó una influyente organización panafricanista.",
+      "Promovió el orgullo racial y la unidad de todos los pueblos de origen africano en el mundo.",
+      "Impulsó proyectos económicos y una compañía naviera propiedad de afroamericanos para fomentar la autosuficiencia.",
+      "Sus ideas influyeron directamente en movimientos posteriores como el rastafarismo jamaicano.",
+      "Fue encarcelado y finalmente deportado de Estados Unidos, considerado un pionero del nacionalismo negro moderno."
+    ]},
+    {name:"Julius Nyerere", aliases:["julius nyerere"], clues:[
+      "Maestro y político nacido en la actual Tanzania en 1922, hijo de un jefe tribal local.",
+      "Lideró el movimiento independentista de su territorio, entonces bajo administración británica.",
+      "Se convirtió en el primer presidente de su país tras la independencia y posterior unión con la isla de Zanzíbar.",
+      "Impulsó un modelo socialista africano basado en la solidaridad comunitaria tradicional, con resultados económicos mixtos.",
+      "Es conocido como el padre de la nación tanzana, apodado 'Mwalimu', que significa 'maestro' en swahili."
+    ]},
+    {name:"Desmond Tutu", aliases:["desmond tutu"], clues:[
+      "Clérigo sudafricano nacido en 1931, que se convirtió en una destacada voz religiosa contra el sistema de segregación racial de su país.",
+      "Se convirtió en el primer arzobispo negro de la Iglesia anglicana de Ciudad del Cabo.",
+      "Recibió el Premio Nobel de la Paz por su lucha pacífica contra el apartheid sudafricano.",
+      "Presidió tras el fin del apartheid una comisión encargada de investigar los abusos cometidos durante ese periodo.",
+      "Acuñó la expresión 'nación del arcoíris' para describir a la nueva Sudáfrica multirracial y democrática."
+    ]},
+    {name:"Wangari Maathai", aliases:["wangari maathai"], clues:[
+      "Bióloga keniana nacida en 1940, la primera mujer de África Central y Oriental en obtener un doctorado.",
+      "Fundó un movimiento que animaba a las mujeres rurales a plantar árboles para combatir la deforestación y la pobreza.",
+      "Su organización llegó a plantar decenas de millones de árboles en Kenia y otros países africanos.",
+      "Fue detenida y agredida en varias ocasiones por su activismo político y medioambiental frente al gobierno keniano.",
+      "Fue la primera mujer africana en recibir el Premio Nobel de la Paz, en 2004, fundadora del Movimiento Cinturón Verde."
+    ]},
+    {name:"Isabel II del Reino Unido", aliases:["isabel ii del reino unido","isabel ii","reina isabel ii"], clues:[
+      "Nacida en Londres en 1926, no estaba destinada a reinar hasta que su tío abdicó por su matrimonio con una divorciada.",
+      "Sirvió como mecánica y conductora militar durante la Segunda Guerra Mundial, un hecho poco habitual para una princesa.",
+      "Subió al trono en 1952 mientras se encontraba de viaje oficial en Kenia, al recibir la noticia de la muerte de su padre.",
+      "Vivió la transformación del antiguo Imperio británico en una asociación de naciones independientes conocida como Commonwealth.",
+      "Se convirtió en la monarca británica con el reinado más largo de la historia, con más de setenta años en el trono."
+    ]}
+  ];
+
+  var MAX_CLUES = 5;
+  var POINTS = [100, 80, 60, 40, 20];
+  var RESET_HOUR = 9; // el personaje cambia a esta hora, hora de España
+  var EPOCH = new Date(Date.UTC(2024,0,1)); // dias desde aqui para elegir personaje
+
+  var madridFmt = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Madrid', year:'numeric', month:'2-digit', day:'2-digit',
+    hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
+  });
+  function madridParts(){
+    var parts = {};
+    madridFmt.formatToParts(new Date()).forEach(function(p){
+      if(p.type !== 'literal') parts[p.type] = parseInt(p.value, 10);
+    });
+    return parts;
+  }
+  function todayLocal(){
+    var p = madridParts();
+    var d = new Date(Date.UTC(p.year, p.month - 1, p.day));
+    if(p.hour < RESET_HOUR) d.setUTCDate(d.getUTCDate() - 1);
+    return d;
+  }
+  function dayIndex(){
+    var t = todayLocal();
+    var diff = Math.round((t - EPOCH) / 86400000);
+    return ((diff % PLAYERS.length) + PLAYERS.length) % PLAYERS.length;
+  }
+  function dateKey(){
+    var t = todayLocal();
+    return t.getUTCFullYear()+'-'+String(t.getUTCMonth()+1).padStart(2,'0')+'-'+String(t.getUTCDate()).padStart(2,'0');
+  }
+  function normalize(s){
+    return s.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g,'')
+      .replace(/['’.]/g,'')
+      .replace(/[^a-z0-9\s]/g,'')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+
+  var player = PLAYERS[dayIndex()];
+  var storeKey = 'crackhistoria_' + dateKey();
+  var state = loadState();
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(storeKey);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return { guesses: [], status: 'playing', lbSubmitted: false }; // status: playing | won | lost
+  }
+  function saveState(){
+    localStorage.setItem(storeKey, JSON.stringify(state));
+  }
+
+  function getNick(){
+    try{ return localStorage.getItem('crackhistoria_nick') || ''; }catch(e){ return ''; }
+  }
+  function setNick(n){
+    try{ localStorage.setItem('crackhistoria_nick', n); }catch(e){}
+  }
+
+  function getGroupId(){
+    try{ return localStorage.getItem('crackhistoria_group_id') || ''; }catch(e){ return ''; }
+  }
+  function getGroupName(){
+    try{ return localStorage.getItem('crackhistoria_group_name') || ''; }catch(e){ return ''; }
+  }
+  function setGroup(id, name){
+    try{
+      localStorage.setItem('crackhistoria_group_id', id);
+      localStorage.setItem('crackhistoria_group_name', name);
+    }catch(e){}
+  }
+  function clearGroup(){
+    try{
+      localStorage.removeItem('crackhistoria_group_id');
+      localStorage.removeItem('crackhistoria_group_name');
+    }catch(e){}
+  }
+  function randGroupId(){
+    return Math.random().toString(36).slice(2,8).toUpperCase();
+  }
+  function groupLink(id, name){
+    return location.origin + location.pathname + '?g=' + encodeURIComponent(id) + '&n=' + encodeURIComponent(name);
+  }
+
+  // ---------- DOM refs ----------
+  var dotsEl = document.getElementById('dots');
+  var clueListEl = document.getElementById('clueList');
+  var guessZoneEl = document.getElementById('guessZone');
+  var inputEl = document.getElementById('guessInput');
+  var submitBtn = document.getElementById('submitBtn');
+  var suggestionsEl = document.getElementById('suggestions');
+  var historyEl = document.getElementById('history');
+  var resultEl = document.getElementById('result');
+  var resultFlagEl = document.getElementById('resultFlag');
+  var resultNameEl = document.getElementById('resultName');
+  var resultSubEl = document.getElementById('resultSub');
+  var avatarEl = document.getElementById('avatar');
+  var shareBtn = document.getElementById('shareBtn');
+  var countdownEl = document.getElementById('countdown');
+  var matchdayEl = document.getElementById('matchday');
+  var datestrEl = document.getElementById('datestr');
+  var rulesBtn = document.getElementById('rulesBtn');
+  var overlay = document.getElementById('overlay');
+  var overlayClose = document.getElementById('overlayClose');
+  var pointsLineEl = document.getElementById('pointsLine');
+  var whatsappBtn = document.getElementById('whatsappBtn');
+  var lbRowsEl = document.getElementById('lbRows');
+  var lbNoteEl = document.getElementById('lbNote');
+  var lbBodyEl = document.getElementById('lbBody');
+  var tabToday = document.getElementById('tabToday');
+  var tabTotal = document.getElementById('tabTotal');
+  var nickOverlay = document.getElementById('nickOverlay');
+  var nickInput = document.getElementById('nickInput');
+  var nickSave = document.getElementById('nickSave');
+  var tabGroup = document.getElementById('tabGroup');
+  var groupOverlay = document.getElementById('groupOverlay');
+  var groupNameInput = document.getElementById('groupNameInput');
+  var groupCreateSave = document.getElementById('groupCreateSave');
+  var groupNoneEl = document.getElementById('groupNone');
+  var groupActiveEl = document.getElementById('groupActive');
+  var groupNameLabelEl = document.getElementById('groupNameLabel');
+  var groupCreateBtn = document.getElementById('groupCreateBtn');
+  var groupCopyBtn = document.getElementById('groupCopyBtn');
+  var groupWhatsappBtn = document.getElementById('groupWhatsappBtn');
+  var groupLeaveBtn = document.getElementById('groupLeaveBtn');
+
+  matchdayEl.textContent = '#' + (dayIndex()+1);
+  datestrEl.textContent = todayLocal().toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric', timeZone:'UTC'});
+
+  rulesBtn.addEventListener('click', function(){ overlay.classList.add('open'); });
+  overlayClose.addEventListener('click', function(){ overlay.classList.remove('open'); });
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.classList.remove('open'); });
+
+  // ---------- grupos ----------
+  (function initGroupFromUrl(){
+    var params = new URLSearchParams(location.search);
+    var g = params.get('g');
+    if(g){
+      var n = params.get('n') || 'Grupo';
+      setGroup(g, n);
+    }
+  })();
+
+  function renderGroupCard(){
+    var id = getGroupId();
+    if(id){
+      groupNoneEl.style.display = 'none';
+      groupActiveEl.style.display = '';
+      groupNameLabelEl.textContent = getGroupName();
+      var link = groupLink(id, getGroupName());
+      groupWhatsappBtn.href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent('Únete a mi grupo "' + getGroupName() + '" en Personaje de la Historia 📜 ' + link);
+    } else {
+      groupNoneEl.style.display = '';
+      groupActiveEl.style.display = 'none';
+    }
+    tabGroup.style.display = id ? '' : 'none';
+    if(!id && lbMode === 'group') setLbMode('today');
+  }
+
+  groupCreateBtn.addEventListener('click', function(){
+    groupNameInput.value = '';
+    groupOverlay.classList.add('open');
+    groupNameInput.focus();
+  });
+  groupOverlay.addEventListener('click', function(e){ if(e.target === groupOverlay) groupOverlay.classList.remove('open'); });
+  groupCreateSave.addEventListener('click', createGroupFromInput);
+  groupNameInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') createGroupFromInput(); });
+  function createGroupFromInput(){
+    var v = groupNameInput.value.trim().slice(0,24);
+    if(!v) return;
+    setGroup(randGroupId(), v);
+    groupOverlay.classList.remove('open');
+    renderGroupCard();
+  }
+  groupCopyBtn.addEventListener('click', function(){
+    var link = groupLink(getGroupId(), getGroupName());
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(link).then(function(){
+        groupCopyBtn.textContent = '¡Copiado!';
+        setTimeout(function(){ groupCopyBtn.textContent = 'Copiar enlace'; }, 1600);
+      });
+    }
+  });
+  groupLeaveBtn.addEventListener('click', function(){
+    clearGroup();
+    renderGroupCard();
+    renderLeaderboard();
+  });
+
+  // ---------- clasificacion compartida (capacidad live-doc del artefacto) ----------
+  var inArtifactHost = !!(window.claude);
+  var lbMode = 'today';
+
+  if(!inArtifactHost && lbBodyEl.children.length === 0){
+    try{
+      var cached = JSON.parse(localStorage.getItem('crackhistoria_lb_cache') || '[]');
+      cached.forEach(function(entry){ appendLbRow(entry, false); });
+    }catch(e){}
+  }
+
+  function appendLbRow(entry, persistLocal){
+    var tr = document.createElement('tr');
+    tr.dataset.name = entry.name;
+    tr.dataset.points = entry.points;
+    tr.dataset.clues = entry.clues;
+    tr.dataset.matchday = entry.matchday;
+    tr.dataset.date = entry.date;
+    tr.dataset.group = entry.group || '';
+    lbBodyEl.appendChild(tr);
+    if(persistLocal && !inArtifactHost){
+      try{
+        var cached = JSON.parse(localStorage.getItem('crackhistoria_lb_cache') || '[]');
+        cached.push(entry);
+        if(cached.length > 500) cached = cached.slice(cached.length - 500);
+        localStorage.setItem('crackhistoria_lb_cache', JSON.stringify(cached));
+      }catch(e){}
+    }
+  }
+
+  function readLbRows(){
+    return Array.prototype.map.call(lbBodyEl.children, function(tr){
+      return {
+        name: tr.dataset.name,
+        points: parseInt(tr.dataset.points, 10) || 0,
+        clues: parseInt(tr.dataset.clues, 10) || 0,
+        matchday: tr.dataset.matchday,
+        date: tr.dataset.date,
+        group: tr.dataset.group || ''
+      };
+    });
+  }
+
+  function renderLeaderboard(){
+    var rows = readLbRows();
+    var myNick = getNick();
+    var list, note;
+    if(lbMode === 'group'){
+      var gid = getGroupId();
+      var grows = rows.filter(function(r){ return gid && r.group === gid; });
+      var gtotals = {};
+      grows.forEach(function(r){
+        if(!gtotals[r.name]) gtotals[r.name] = { name: r.name, points: 0, days: 0 };
+        gtotals[r.name].points += r.points;
+        gtotals[r.name].days += 1;
+      });
+      list = Object.keys(gtotals).map(function(k){ return gtotals[k]; });
+      list.sort(function(a,b){ return b.points - a.points; });
+      note = 'Puntos totales para "' + getGroupName() + '".';
+    } else if(lbMode === 'today'){
+      list = rows.filter(function(r){ return r.matchday === String(dayIndex()+1); });
+      list.sort(function(a,b){ return b.points - a.points || a.clues - b.clues; });
+      note = 'Jugadores que ya han completado el personaje de hoy.';
+    } else {
+      var totals = {};
+      rows.forEach(function(r){
+        if(!totals[r.name]) totals[r.name] = { name: r.name, points: 0, days: 0 };
+        totals[r.name].points += r.points;
+        totals[r.name].days += 1;
+      });
+      list = Object.keys(totals).map(function(k){ return totals[k]; });
+      list.sort(function(a,b){ return b.points - a.points; });
+      note = 'Puntos totales acumulados en todas las partidas.';
+    }
+    lbNoteEl.textContent = inArtifactHost ? note : (note + ' (guardado solo en este dispositivo — publica el juego para compartir la clasificación con más gente).');
+    lbRowsEl.innerHTML = '';
+    if(!list.length){
+      var empty = document.createElement('div');
+      empty.className = 'lb-empty';
+      empty.textContent = 'Todavía no hay nadie aquí. ¡Sé el primero!';
+      lbRowsEl.appendChild(empty);
+      return;
+    }
+    list.slice(0, 20).forEach(function(r, i){
+      var row = document.createElement('div');
+      row.className = 'lb-row' + (r.name === myNick ? ' me' : '');
+      var cluesTxt = lbMode === 'today' ? (r.clues + '/' + MAX_CLUES + ' pistas') : (r.days + (r.days===1?' día':' días'));
+      row.innerHTML =
+        '<span class="lb-rank">'+(i+1)+'</span>' +
+        '<span class="lb-name"></span>' +
+        '<span class="lb-clues"></span>' +
+        '<span class="lb-pts"></span>';
+      row.querySelector('.lb-name').textContent = r.name;
+      row.querySelector('.lb-clues').textContent = cluesTxt;
+      row.querySelector('.lb-pts').textContent = r.points + ' pts';
+      lbRowsEl.appendChild(row);
+    });
+  }
+
+  function setLbMode(mode){
+    lbMode = mode;
+    [tabToday, tabTotal, tabGroup].forEach(function(t){ t.classList.toggle('active', t.dataset.mode === mode); });
+    renderLeaderboard();
+  }
+  tabToday.addEventListener('click', function(){ setLbMode('today'); });
+  tabTotal.addEventListener('click', function(){ setLbMode('total'); });
+  tabGroup.addEventListener('click', function(){ setLbMode('group'); });
+  document.addEventListener('claude:edit', function(){ renderGroupCard(); renderLeaderboard(); });
+
+  function submitToLeaderboard(){
+    if(state.lbSubmitted) return;
+    var nick = getNick();
+    if(!nick){
+      nickOverlay.classList.add('open');
+      return;
+    }
+    var pts = state.status === 'won' ? POINTS[state.guesses.length - 1] : 0;
+    appendLbRow({
+      name: nick,
+      points: pts,
+      clues: state.status === 'won' ? state.guesses.length : MAX_CLUES,
+      matchday: String(dayIndex()+1),
+      date: dateKey(),
+      group: getGroupId()
+    }, true);
+    state.lbSubmitted = true;
+    saveState();
+    renderLeaderboard();
+  }
+
+  nickSave.addEventListener('click', saveNick);
+  nickInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') saveNick(); });
+  nickOverlay.addEventListener('click', function(e){ if(e.target === nickOverlay) nickOverlay.classList.remove('open'); });
+  function saveNick(){
+    var v = nickInput.value.trim().slice(0,18);
+    if(!v) return;
+    setNick(v);
+    nickOverlay.classList.remove('open');
+    if(state.status !== 'playing') submitToLeaderboard();
+    renderLeaderboard();
+  }
+  document.getElementById('changeNick').addEventListener('click', function(){
+    nickInput.value = getNick();
+    nickOverlay.classList.add('open');
+    nickInput.focus();
+  });
+
+  function attemptsUsed(){ return state.guesses.length; }
+  function cluesToShow(){ return Math.min(attemptsUsed()+1, MAX_CLUES); }
+
+  function initials(name){
+    return name.split(' ').filter(function(w){return w.length>1;}).slice(0,2).map(function(w){return w[0];}).join('').toUpperCase();
+  }
+
+  function render(){
+    // dots
+    dotsEl.innerHTML = '';
+    for(var i=0;i<MAX_CLUES;i++){
+      var d = document.createElement('div');
+      d.className = 'dot';
+      if(i < state.guesses.length){
+        d.classList.add(state.guesses[i].correct ? 'correct' : 'wrong');
+      } else if(i === state.guesses.length && state.status === 'playing'){
+        d.classList.add('current');
+      }
+      dotsEl.appendChild(d);
+    }
+
+    // pistas
+    clueListEl.innerHTML = '';
+    var n = state.status === 'playing' ? cluesToShow() : Math.max(cluesToShow(), state.guesses.length);
+    for(var c=0;c<n;c++){
+      var row = document.createElement('div');
+      row.className = 'clue';
+      row.innerHTML = '<div class="clue-num">'+(c+1)+'/'+MAX_CLUES+'</div><div class="clue-text"></div>';
+      row.querySelector('.clue-text').textContent = player.clues[c];
+      clueListEl.appendChild(row);
+    }
+
+    // historial
+    historyEl.innerHTML = '';
+    state.guesses.forEach(function(g){
+      if(g.correct) return;
+      var item = document.createElement('div');
+      item.className = 'history-item wrong';
+      item.innerHTML = '<span class="mark">✕</span><span class="name"></span>';
+      item.querySelector('.name').textContent = g.text;
+      historyEl.appendChild(item);
+    });
+
+    // zona de respuesta / resultado
+    if(state.status === 'playing'){
+      guessZoneEl.style.display = '';
+      resultEl.classList.remove('show');
+      inputEl.value = '';
+      inputEl.disabled = false;
+      submitBtn.disabled = false;
+      inputEl.focus({preventScroll:true});
+    } else {
+      guessZoneEl.style.display = 'none';
+      showResult();
+    }
+  }
+
+  function showResult(){
+    resultEl.classList.add('show');
+    var win = state.status === 'won';
+    resultFlagEl.textContent = win ? '¡ACERTADO!' : 'SE ACABARON LAS PISTAS';
+    resultFlagEl.className = 'result-flag ' + (win ? 'win' : 'lose');
+    resultNameEl.textContent = player.name;
+    avatarEl.textContent = initials(player.name);
+    var used = win ? state.guesses.length : MAX_CLUES;
+    resultSubEl.textContent = win
+      ? ('Lo has adivinado con ' + used + ' de ' + MAX_CLUES + ' pistas.')
+      : ('Era ' + player.name + '. ¡Mañana, otra oportunidad!');
+    var pts = win ? POINTS[state.guesses.length - 1] : 0;
+    pointsLineEl.innerHTML = win ? ('+ <b>'+pts+'</b> puntos') : '+ <b>0</b> puntos';
+    whatsappBtn.href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText() + '\n\n' + window.location.href);
+    startCountdown();
+    submitToLeaderboard();
+    renderLeaderboard();
+  }
+
+  function shareText(){
+    var boxes = '';
+    for(var i=0;i<MAX_CLUES;i++){
+      if(i < state.guesses.length){
+        boxes += state.guesses[i].correct ? '🟩' : '🟥';
+      } else {
+        boxes += '⬜';
+      }
+    }
+    var result = state.status === 'won' ? (state.guesses.length + '/' + MAX_CLUES) : 'X/' + MAX_CLUES;
+    return 'PERSONAJE DE LA HISTORIA #' + (dayIndex()+1) + ' — ' + result + '\n' + boxes;
+  }
+
+  shareBtn.addEventListener('click', function(){
+    var txt = shareText();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){
+        shareBtn.textContent = '¡Copiado!';
+        setTimeout(function(){ shareBtn.textContent = 'Copiar resultado'; }, 1600);
+      });
+    }
+  });
+
+  function startCountdown(){
+    function tick(){
+      var p = madridParts();
+      var secsNow = p.hour*3600 + p.minute*60 + p.second;
+      var target = RESET_HOUR*3600;
+      var diff = ((target - secsNow) % 86400 + 86400) % 86400;
+      var h = Math.floor(diff/3600);
+      var m = Math.floor((diff%3600)/60);
+      var s = diff%60;
+      countdownEl.textContent = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    }
+    tick();
+    clearInterval(window.__cdInt);
+    window.__cdInt = setInterval(tick, 1000);
+  }
+
+  // ---------- autocompletado ----------
+  var activeIndex = -1;
+  function updateSuggestions(){
+    var q = normalize(inputEl.value);
+    activeIndex = -1;
+    if(q.length < 4){ suggestionsEl.classList.remove('open'); suggestionsEl.innerHTML=''; return; }
+    var matches = PLAYERS.filter(function(p){ return normalize(p.name).indexOf(q) !== -1; }).slice(0,6);
+    if(!matches.length){ suggestionsEl.classList.remove('open'); suggestionsEl.innerHTML=''; return; }
+    suggestionsEl.innerHTML = '';
+    matches.forEach(function(p){
+      var div = document.createElement('div');
+      div.className = 'suggestion';
+      div.textContent = p.name;
+      div.addEventListener('mousedown', function(e){
+        e.preventDefault();
+        inputEl.value = p.name;
+        suggestionsEl.classList.remove('open');
+        submitGuess();
+      });
+      suggestionsEl.appendChild(div);
+    });
+    suggestionsEl.classList.add('open');
+  }
+
+  inputEl.addEventListener('input', updateSuggestions);
+  inputEl.addEventListener('keydown', function(e){
+    var items = suggestionsEl.querySelectorAll('.suggestion');
+    if(e.key === 'ArrowDown' && items.length){
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex+1, items.length-1);
+      items.forEach(function(it,i){ it.classList.toggle('active', i===activeIndex); });
+    } else if(e.key === 'ArrowUp' && items.length){
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex-1, 0);
+      items.forEach(function(it,i){ it.classList.toggle('active', i===activeIndex); });
+    } else if(e.key === 'Enter'){
+      e.preventDefault();
+      if(activeIndex >= 0 && items[activeIndex]){
+        inputEl.value = items[activeIndex].textContent;
+      }
+      suggestionsEl.classList.remove('open');
+      submitGuess();
+    } else if(e.key === 'Escape'){
+      suggestionsEl.classList.remove('open');
+    }
+  });
+  document.addEventListener('click', function(e){
+    if(!suggestionsEl.contains(e.target) && e.target !== inputEl){
+      suggestionsEl.classList.remove('open');
+    }
+  });
+  submitBtn.addEventListener('click', submitGuess);
+
+  function submitGuess(){
+    if(state.status !== 'playing') return;
+    var raw = inputEl.value.trim();
+    if(!raw) return;
+    var norm = normalize(raw);
+    var correct = player.aliases.some(function(a){ return normalize(a) === norm; }) || normalize(player.name) === norm;
+
+    state.guesses.push({ text: raw, correct: correct });
+    if(correct){
+      state.status = 'won';
+    } else if(state.guesses.length >= MAX_CLUES){
+      state.status = 'lost';
+    }
+    saveState();
+    render();
+  }
+
+  render();
+  renderGroupCard();
+  renderLeaderboard();
+})();
+</script>
+</body>
+</html>
